@@ -15,4 +15,4 @@ function manhattanDistance(cell1, cell2) {
 	return d1 + d2;
 }
 
-module.exports = { euclideanDistance, manhattanDistance };
+export { euclideanDistance, manhattanDistance };

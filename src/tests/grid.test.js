@@ -1,5 +1,5 @@
-const Cell = require('../cell');
-const Grid = require('../grid');
+import Cell from '../lib/cell.mjs';
+import Grid from '../lib/grid.mjs';
 
 test('should be defined', () => {
 	expect(Grid).toBeDefined();

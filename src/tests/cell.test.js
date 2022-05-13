@@ -1,4 +1,4 @@
-const Cell = require('../cell');
+import Cell from '../lib/cell.mjs';
 
 test('should be defined', () => {
 	expect(Cell).toBeDefined();

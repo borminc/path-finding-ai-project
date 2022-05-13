@@ -1,6 +1,9 @@
-const AStar = require('../aStar');
-const Grid = require('../grid');
-const { euclideanDistance, manhattanDistance } = require('../utils/heuristic');
+import AStar from '../lib/aStar.mjs';
+import Grid from '../lib/grid.mjs';
+import {
+	euclideanDistance,
+	manhattanDistance,
+} from '../lib/utils/heuristic.mjs';
 
 test('should be defined', () => {
 	expect(AStar).toBeDefined();

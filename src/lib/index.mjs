@@ -1,5 +1,5 @@
-const Grid = require('./grid');
-const AStar = require('./aStar');
+import Grid from './grid.mjs';
+import AStar from './aStar.mjs';
 
 const maxWidth = 10;
 const maxHeight = 20;

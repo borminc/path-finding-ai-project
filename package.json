@@ -6,7 +6,6 @@
 		"@testing-library/jest-dom": "^5.16.4",
 		"@testing-library/react": "^13.2.0",
 		"@testing-library/user-event": "^13.5.0",
-		"cli-color": "^2.0.2",
 		"react": "^18.1.0",
 		"react-dom": "^18.1.0",
 		"react-scripts": "5.0.1",
@@ -17,8 +16,7 @@
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"lib-test": "jest",
-		"lib-start": "node lib/index.js"
+		"start:lib": "node src/lib/index.mjs"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -41,5 +39,10 @@
 	"devDependencies": {
 		"@babel/plugin-transform-modules-commonjs": "^7.17.9",
 		"jest": "^28.1.0"
+	},
+	"jest": {
+		"transform": {
+			"^.+\\.[t|j]s?$": "babel-jest"
+		}
 	}
 }

@@ -1,4 +1,4 @@
-const { areEqualDeep } = require('./utils/helpers');
+import { areEqualDeep } from './utils/helpers.mjs';
 
 class Cell {
 	constructor([x, y], data = null, { isObstacle = false } = {}) {
@@ -61,4 +61,4 @@ class Cell {
 	}
 }
 
-module.exports = Cell;
+export default Cell;

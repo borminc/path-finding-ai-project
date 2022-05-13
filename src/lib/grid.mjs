@@ -1,5 +1,5 @@
-const Cell = require('./cell');
-const { getRandomInt } = require('./utils/helpers');
+import Cell from './cell.mjs';
+import { getRandomInt } from './utils/helpers.mjs';
 
 class Direction {
 	static TOP_LEFT = [-1, -1];
@@ -12,7 +12,7 @@ class Direction {
 	static LEFT = [-1, 0];
 }
 
-class Grid {
+export default class Grid {
 	constructor(width, height, { allowDiagonalNeighbors = true } = {}) {
 		this.width = width;
 		this.height = height;
@@ -123,5 +123,3 @@ class Grid {
 		return cellList[getRandomInt(0, cellList.length - 1)];
 	}
 }
-
-module.exports = Grid;

@@ -1,8 +1,8 @@
-const Grid = require('./grid');
-const { highlightCell } = require('./utils/helpers');
-const { euclideanDistance, manhattanDistance } = require('./utils/heuristic');
+import Grid from './grid.mjs';
+import { colorString, highlightCell } from './utils/helpers.mjs';
+import { euclideanDistance, manhattanDistance } from './utils/heuristic.mjs';
 
-class AStar {
+export default class AStar {
 	constructor(
 		grid,
 		{
@@ -136,16 +136,18 @@ class AStar {
 			console.log(s);
 		});
 
+		console.log();
+
 		if (path.length > 0) {
 			console.log(
-				'\nPath: ',
+				'Path: ',
 				path
 					.map(cell => highlightCell(cell, startCell, endCell, path))
 					.join(' ')
 			);
 			console.log(`Cells in path: ${path.length}`);
 		} else {
-			console.log('\nCould not find a path');
+			console.log(colorString('Could not find a path', 'red'));
 		}
 
 		console.timeEnd('Time');
@@ -153,5 +155,3 @@ class AStar {
 		return path;
 	}
 }
-
-module.exports = AStar;
