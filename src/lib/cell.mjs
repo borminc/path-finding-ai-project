@@ -1,4 +1,5 @@
 import { areEqualDeep } from './utils/helpers.mjs';
+import lodash from 'lodash';
 
 class Cell {
 	constructor([x, y], data = null, { isObstacle = false } = {}) {
@@ -50,14 +51,7 @@ class Cell {
 	}
 
 	clone() {
-		const c = new Cell([this.x, this.y], this.data);
-
-		// copy all properties
-		for (const [k, v] of Object.entries(this)) {
-			c[k] = v;
-		}
-
-		return c;
+		return lodash.cloneDeep(this);
 	}
 }
 

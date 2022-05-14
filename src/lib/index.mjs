@@ -3,9 +3,9 @@ import AStar from './aStar.mjs';
 
 const maxWidth = 10;
 const maxHeight = 20;
-const nObstacles = 100;
+const nObstacles = 20;
 
-const grid = new Grid(maxWidth, maxHeight, { allowDiagonalNeighbors: true });
+const grid = new Grid(maxWidth, maxHeight, { allowDiagonalNeighbors: false });
 
 // make some cells obstacles
 for (let i = 0; i < nObstacles; i++) {

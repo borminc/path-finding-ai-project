@@ -1,0 +1,23 @@
+td {
+	position: relative;
+	border: solid grey 0.5px;
+	padding: 0;
+	margin: 0;
+}
+td:after {
+	content: '';
+	display: block;
+	margin-top: 100%;
+}
+td > div {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}

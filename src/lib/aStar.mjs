@@ -1,6 +1,7 @@
 import Grid from './grid.mjs';
 import { colorString, highlightCell } from './utils/helpers.mjs';
 import { euclideanDistance, manhattanDistance } from './utils/heuristic.mjs';
+import lodash from 'lodash';
 
 export default class AStar {
 	constructor(
@@ -107,7 +108,7 @@ export default class AStar {
 							this.includesStartCellInPath ? startCell : null
 						);
 
-						this.tracePathProgressCb(path);
+						this.tracePathProgressCb(path, lodash.cloneDeep(this.grid));
 					}
 				}
 			}
