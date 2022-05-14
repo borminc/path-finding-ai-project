@@ -1,11 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import Grid from '../lib/grid.mjs';
 import AStar from '../lib/aStar.mjs';
 
-const sleep = ms => {
-	return new Promise(resolve => setTimeout(resolve, ms));
-};
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const defaultGrid = () => new Grid(50, 50);
 
@@ -17,12 +14,13 @@ const useAStar = ({
 	initialPath = null,
 	initialGrid = null,
 } = {}) => {
-	const [isInProgress, setIsInProgress] = React.useState(false);
+	const [isOutputting, setIsOutputting] = React.useState(false);
 
 	const [path, setPath] = React.useState(initialPath ?? []);
+	const [livePath, setLivePath] = React.useState([]);
+
 	const [pathStates, setPathStates] = React.useState([]);
 	const [gridStates, setGridStates] = React.useState([]);
-	const [livePath, setLivePath] = React.useState([]);
 
 	const [aStar, setAStar] = React.useState(
 		new AStar(initialGrid ?? defaultGrid(), {
@@ -38,52 +36,76 @@ const useAStar = ({
 	const [startCell, setStartCell] = React.useState(initialStartCell);
 	const [endCell, setEndCell] = React.useState(initialEndCell);
 
-	const findPath = (startCell, endCell, aStar) => {
-		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
-			alert(
-				'number of obstacles exceeds the number of available cells (minus start and end cells)'
-			);
-			return;
-		}
+	const generateRandomProblem = () => {
 		try {
-			// make some cells obstacles
-			for (let i = 0; i < numberOfObstacles; i++) {
-				aStar.grid
-					.getRandomCell(
-						cell =>
-							cell.isAPath() &&
-							!cell.isSameXY(startCell) &&
-							!cell.isSameXY(endCell)
-					)
-					.setIsObstacle(true).data = '  •  ';
+			const { aStar, newStartCell, newEndCell } = resetAStar({
+				randomizeObstacles: true,
+			});
+
+			const path = aStar.findPath(newStartCell, newEndCell);
+
+			if (!path || path.length === 0) {
+				alert('no path found');
 			}
 
-			return aStar.findPath(startCell, endCell);
+			setPath(path || []);
 		} catch (err) {
-			return [];
+			console.log(err);
+			setPath([]);
+			alert('error');
 		}
 	};
 
-	const generateRandomProblem = () => {
-		const newStartCell = aStar.grid.getRandomCell(cell => cell.isAPath());
-		const newEndCell = aStar.grid.getRandomCell(
-			cell => cell.isAPath() && !cell.isSameXY(newStartCell)
-		);
+	const resetAStar = ({
+		startCell = null,
+		endCell = null,
+		randomizeObstacles = false,
+	} = {}) => {
+		const newStartCell =
+			startCell ?? aStar.grid.getRandomCell(cell => cell.isAPath());
+		const newEndCell =
+			endCell ??
+			aStar.grid.getRandomCell(
+				cell => cell.isAPath() && !cell.isSameXY(newStartCell)
+			);
 
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
 
 		aStar.grid = initialGrid;
-		setAStar(aStar);
 
-		const path = findPath(newStartCell, newEndCell, aStar);
-		if (!path || path.length === 0) {
-			alert('no path found');
+		if (!randomizeObstacles) {
+			setAStar(aStar);
+			return { aStar, newStartCell, newEndCell };
 		}
-		setPath(path || []);
+
+		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
+			alert(
+				'number of obstacles exceeds the number of available cells (minus start and end cells)'
+			);
+		} else {
+			for (let i = 0; i < numberOfObstacles; i++) {
+				aStar.grid
+					.getRandomCell(
+						cell =>
+							cell.isAPath() &&
+							!cell.isSameXY(newStartCell) &&
+							!cell.isSameXY(newEndCell)
+					)
+					.setIsObstacle(true).data = '  •  ';
+			}
+		}
+
+		setAStar(aStar);
+		return { aStar, newStartCell, newEndCell };
 	};
 
-	const updateLivePath = async () => {
+	const updateLivePath = async path => {
+		if (!path || path.length === 0) {
+			setIsOutputting(false);
+			return;
+		}
+
 		for (const _path of pathStates) {
 			setLivePath(_path);
 			await sleep(renderSpeed);
@@ -92,10 +114,15 @@ const useAStar = ({
 		setLivePath(path); // the final path
 		setPathStates([]);
 
-		setIsInProgress(false);
+		setIsOutputting(false);
 	};
 
-	const updateLiveGrid = async () => {
+	const updateLiveGrid = async path => {
+		if (!path || path.length === 0) {
+			setIsOutputting(false);
+			return;
+		}
+
 		for (const _grid of gridStates) {
 			setLiveGrid(_grid);
 			await sleep(renderSpeed);
@@ -104,20 +131,20 @@ const useAStar = ({
 		setLiveGrid(aStar.grid); // the final grid
 		setGridStates([]);
 
-		setIsInProgress(false);
+		setIsOutputting(false);
 	};
 
-	// update livePath with path has changed
+	// update livePath when path has changed
 	React.useEffect(() => {
-		setIsInProgress(true);
-		updateLiveGrid();
-		updateLivePath();
+		setIsOutputting(true);
+		updateLiveGrid(path);
+		updateLivePath(path);
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [path]);
 
 	return {
-		isInProgress,
+		isOutputting,
 		liveGrid,
 		startCell,
 		setStartCell,
@@ -129,7 +156,6 @@ const useAStar = ({
 		pathStates,
 		livePath,
 		setPath,
-		findPath,
 		generateRandomProblem,
 	};
 };

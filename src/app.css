@@ -1,8 +1,12 @@
+table {
+	table-layout: fixed;
+}
 td {
 	position: relative;
 	border: solid grey 0.5px;
 	padding: 0;
 	margin: 0;
+	white-space: nowrap;
 }
 td:after {
 	content: '';
