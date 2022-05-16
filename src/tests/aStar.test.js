@@ -29,7 +29,10 @@ test('should use specified heuristic algorithm', () => {
 	expect(b.heuristic(cell3, cell4)).toBe(manhattanDistance(cell3, cell4));
 });
 
-test('should trace path correctly with start cell', () => {
+test('should trace path correctly with start cell', async () => {
+	var callbackWasCalled = false;
+	var changingPath = [];
+
 	const grid = new Grid(5, 5);
 	const aStar = new AStar(grid, {
 		tracePathProgressCb: _path => {
@@ -47,10 +50,7 @@ test('should trace path correctly with start cell', () => {
 	const start = grid.getCellAtXY([0, 0]);
 	const end = grid.getCellAtXY([0, 4]);
 
-	var callbackWasCalled = false;
-	var changingPath = [];
-
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(callbackWasCalled).toBe(true);
 	expect(changingPath).toEqual(path);
@@ -58,7 +58,7 @@ test('should trace path correctly with start cell', () => {
 	expect(path[path.length - 1]).toEqual(end);
 });
 
-test('should trace path correctly without start cell', () => {
+test('should trace path correctly without start cell', async () => {
 	const grid = new Grid(5, 5);
 	const aStar = new AStar(grid, {
 		includesStartCellInPath: false,
@@ -80,7 +80,7 @@ test('should trace path correctly without start cell', () => {
 	var callbackWasCalled = false;
 	var changingPath = [];
 
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(callbackWasCalled).toBe(true);
 	expect(changingPath).toEqual(path);
@@ -89,13 +89,13 @@ test('should trace path correctly without start cell', () => {
 	expect(path[path.length - 1]).toEqual(end);
 });
 
-test('should find correct path with diagonal neighbors', () => {
+test('should find correct path with diagonal neighbors', async () => {
 	const grid = new Grid(5, 5);
 	const aStar = new AStar(grid);
 
 	const start = grid.getCellAtXY([0, 0]);
 	const end = grid.getCellAtXY([0, 4]);
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(path[0]).toEqual(start);
 	expect(path[path.length - 1]).toEqual(end);
@@ -107,13 +107,13 @@ test('should find correct path with diagonal neighbors', () => {
 		});
 });
 
-test('should find correct path without diagonal neighbors', () => {
+test('should find correct path without diagonal neighbors', async () => {
 	const grid = new Grid(5, 5, { allowDiagonalNeighbors: false });
 	const aStar = new AStar(grid);
 
 	const start = grid.getCellAtXY([4, 0]);
 	const end = grid.getCellAtXY([0, 4]);
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(path[0]).toEqual(start);
 	expect(path[path.length - 1]).toEqual(end);
@@ -125,7 +125,7 @@ test('should find correct path without diagonal neighbors', () => {
 		});
 });
 
-test('should find correct path with diagonal neighbors and obstacles', () => {
+test('should find correct path with diagonal neighbors and obstacles', async () => {
 	const grid = new Grid(5, 5, { allowDiagonalNeighbors: true });
 	const aStar = new AStar(grid);
 
@@ -136,7 +136,7 @@ test('should find correct path with diagonal neighbors and obstacles', () => {
 	grid.getCellAtXY([1, 1]).setIsObstacle(true).data = '  -  ';
 	grid.getCellAtXY([3, 4]).setIsObstacle(true).data = '  -  ';
 
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(path[0]).toEqual(start);
 	expect(path[path.length - 1]).toEqual(end);
@@ -148,7 +148,7 @@ test('should find correct path with diagonal neighbors and obstacles', () => {
 		});
 });
 
-test('should find correct path without diagonal neighbors and with obstacles', () => {
+test('should find correct path without diagonal neighbors and with obstacles', async () => {
 	const grid = new Grid(5, 5, { allowDiagonalNeighbors: false });
 	const aStar = new AStar(grid);
 
@@ -159,7 +159,7 @@ test('should find correct path without diagonal neighbors and with obstacles', (
 	grid.getCellAtXY([1, 1]).setIsObstacle(true).data = '  -  ';
 	grid.getCellAtXY([3, 4]).setIsObstacle(true).data = '  -  ';
 
-	const path = aStar.findPath(start, end);
+	const path = await aStar.findPath(start, end);
 
 	expect(path[0]).toEqual(start);
 	expect(path[path.length - 1]).toEqual(end);

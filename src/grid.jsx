@@ -6,15 +6,15 @@ const CELL_SIZE = 15;
 
 const GridComponent = () => {
 	const {
-		isOutputting,
-		liveGrid,
+		isProcessing,
+		path,
+		aStar,
 		startCell,
 		endCell,
-		livePath,
 		generateRandomProblem,
 	} = useAStar({
-		initialGrid: new Grid(50, 50, { allowDiagonalNeighbors: false }),
-		renderSpeed: 0.25,
+		initialGrid: new Grid(50, 50, { allowDiagonalNeighbors: true }),
+		renderSpeed: 0.1,
 		numberOfObstacles: 250,
 	});
 	const [cellSize, setCellSize] = React.useState(CELL_SIZE);
@@ -24,7 +24,7 @@ const GridComponent = () => {
 		if (cell.isObstacle) return 'black';
 		if (startCell && cell.isSameXY(startCell)) return 'blue';
 		if (endCell && cell.isSameXY(endCell)) return 'green';
-		if (cell.isInCellList(livePath)) return 'yellow';
+		if (cell.isInCellList(path)) return 'yellow';
 		if (cell.isVisited) return 'lightgrey';
 		return 'white';
 	};
@@ -45,7 +45,7 @@ const GridComponent = () => {
 			<div>
 				<button
 					onClick={generateRandomProblem}
-					disabled={isOutputting}
+					disabled={isProcessing}
 					className='btn btn-sm btn-outline-primary my-3 me-3'
 				>
 					Random
@@ -80,7 +80,7 @@ const GridComponent = () => {
 			>
 				<table style={{ width: 'min-content' }}>
 					<tbody>
-						{liveGrid.cells.map((row, i) => (
+						{aStar.grid.cells.map((row, i) => (
 							<tr key={i} className=''>
 								{row.map(cell => (
 									<td

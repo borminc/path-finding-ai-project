@@ -14,35 +14,37 @@ const useAStar = ({
 	initialPath = null,
 	initialGrid = null,
 } = {}) => {
-	const [isOutputting, setIsOutputting] = React.useState(false);
+	const [isProcessing, setIsProcessing] = React.useState(false);
 
 	const [path, setPath] = React.useState(initialPath ?? []);
-	const [livePath, setLivePath] = React.useState([]);
-
-	const [pathStates, setPathStates] = React.useState([]);
-	const [gridStates, setGridStates] = React.useState([]);
 
 	const [aStar, setAStar] = React.useState(
 		new AStar(initialGrid ?? defaultGrid(), {
-			tracePathProgressCb: (path, grid) => {
-				setPathStates(prev => [...prev, path]);
-				setGridStates(prev => [...prev, grid]);
+			tracePathProgressCb: async (path, _aStar) => {
+				setPath(path);
+				setAStar(_aStar);
+
+				await sleep(renderSpeed);
 			},
 		})
 	);
 
-	const [liveGrid, setLiveGrid] = React.useState(aStar.grid);
-
 	const [startCell, setStartCell] = React.useState(initialStartCell);
 	const [endCell, setEndCell] = React.useState(initialEndCell);
 
-	const generateRandomProblem = () => {
+	const generateRandomProblem = async () => {
+		if (isProcessing) {
+			return;
+		}
+
+		setIsProcessing(true);
+
 		try {
 			const { aStar, newStartCell, newEndCell } = resetAStar({
 				randomizeObstacles: true,
 			});
 
-			const path = aStar.findPath(newStartCell, newEndCell);
+			const path = await aStar.findPath(newStartCell, newEndCell);
 
 			if (!path || path.length === 0) {
 				alert('no path found');
@@ -54,6 +56,8 @@ const useAStar = ({
 			setPath([]);
 			alert('error');
 		}
+
+		setIsProcessing(false);
 	};
 
 	const resetAStar = ({
@@ -100,52 +104,8 @@ const useAStar = ({
 		return { aStar, newStartCell, newEndCell };
 	};
 
-	const updateLivePath = async path => {
-		if (!path || path.length === 0) {
-			setIsOutputting(false);
-			return;
-		}
-
-		for (const _path of pathStates) {
-			setLivePath(_path);
-			await sleep(renderSpeed);
-		}
-
-		setLivePath(path); // the final path
-		setPathStates([]);
-
-		setIsOutputting(false);
-	};
-
-	const updateLiveGrid = async path => {
-		if (!path || path.length === 0) {
-			setIsOutputting(false);
-			return;
-		}
-
-		for (const _grid of gridStates) {
-			setLiveGrid(_grid);
-			await sleep(renderSpeed);
-		}
-
-		setLiveGrid(aStar.grid); // the final grid
-		setGridStates([]);
-
-		setIsOutputting(false);
-	};
-
-	// update livePath when path has changed
-	React.useEffect(() => {
-		setIsOutputting(true);
-		updateLiveGrid(path);
-		updateLivePath(path);
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [path]);
-
 	return {
-		isOutputting,
-		liveGrid,
+		isProcessing,
 		startCell,
 		setStartCell,
 		endCell,
@@ -153,8 +113,6 @@ const useAStar = ({
 		aStar,
 		setAStar,
 		path,
-		pathStates,
-		livePath,
 		setPath,
 		generateRandomProblem,
 	};

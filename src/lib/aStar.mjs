@@ -1,7 +1,6 @@
 import Grid from './grid.mjs';
 import { colorString, highlightCell } from './utils/helpers.mjs';
 import { euclideanDistance, manhattanDistance } from './utils/heuristic.mjs';
-import lodash from 'lodash';
 
 export default class AStar {
 	constructor(
@@ -31,7 +30,7 @@ export default class AStar {
 
 	tracePath(endCell, startCell = null) {
 		var path = [];
-		var currentCell = endCell.clone();
+		var currentCell = endCell;
 
 		while (currentCell.prev) {
 			path.push(currentCell);
@@ -41,7 +40,7 @@ export default class AStar {
 		return startCell ? [startCell, ...path.reverse()] : path.reverse();
 	}
 
-	findPath(startCell, endCell) {
+	async findPath(startCell, endCell) {
 		startCell = this.grid._resolveCell(startCell);
 		endCell = this.grid._resolveCell(endCell);
 
@@ -108,7 +107,7 @@ export default class AStar {
 							this.includesStartCellInPath ? startCell : null
 						);
 
-						this.tracePathProgressCb(path, lodash.cloneDeep(this.grid));
+						await this.tracePathProgressCb(path, this);
 					}
 				}
 			}
