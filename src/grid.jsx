@@ -71,14 +71,14 @@ const GridComponent = () => {
 			</div>
 
 			<div
-				className='d-flex'
+				className='d-flex border'
 				style={{
 					overflow: 'scroll',
-					maxWidth: '100%',
-					maxHeight: '90%',
+					width: '100%',
+					height: '80%',
 				}}
 			>
-				<table style={{ width: 'min-content' }}>
+				<table style={{ width: 'min-content', height: 'min-content' }}>
 					<tbody>
 						{aStar.grid.cells.map((row, i) => (
 							<tr key={i} className=''>
@@ -100,6 +100,12 @@ const GridComponent = () => {
 					</tbody>
 				</table>
 			</div>
+
+			{path && path.length > 0 && (
+				<small className='text-muted'>
+					Path: {path.map(cell => cell.getXYString()).join(', ')}
+				</small>
+			)}
 		</div>
 	);
 };
