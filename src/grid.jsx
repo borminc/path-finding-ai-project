@@ -1,23 +1,23 @@
 import Grid from './lib/grid.mjs';
 import React from 'react';
 import useAStar from './hooks/useAStar.js';
+import AStar from './lib/aStar.mjs';
+import AStarSettingsModal from './aStarSettingsModal.jsx';
 
 const CELL_SIZE = 15;
 
 const GridComponent = () => {
-	const {
-		isProcessing,
-		path,
-		aStar,
-		startCell,
-		endCell,
-		generateRandomProblem,
-	} = useAStar({
-		initialGrid: new Grid(50, 50, { allowDiagonalNeighbors: true }),
+	const [aStar, setAStar] = React.useState(
+		new AStar(new Grid(50, 50, { allowDiagonalNeighbors: true }))
+	);
+	const [settings, setSettings] = React.useState({
 		renderSpeed: 0.1,
 		numberOfObstacles: 250,
+		cellSize: CELL_SIZE,
 	});
-	const [cellSize, setCellSize] = React.useState(CELL_SIZE);
+
+	const { isProcessing, path, startCell, endCell, generateRandomProblem } =
+		useAStar(aStar, setAStar, settings);
 
 	const getCellColor = cell => {
 		if (!cell) return 'black';
@@ -51,23 +51,12 @@ const GridComponent = () => {
 					Random
 				</button>
 
-				<span>Cell size: {cellSize}</span>
-				<div className='btn-group ms-1'>
-					<button
-						type='button'
-						className='btn btn-sm btn-outline-primary'
-						onClick={() => setCellSize(prev => prev - 1)}
-					>
-						-
-					</button>
-					<button
-						type='button'
-						className='btn btn-sm btn-outline-primary'
-						onClick={() => setCellSize(prev => prev + 1)}
-					>
-						+
-					</button>
-				</div>
+				<AStarSettingsModal
+					aStar={aStar}
+					setAStar={setAStar}
+					settings={settings}
+					setSettings={setSettings}
+				/>
 			</div>
 
 			<div
@@ -86,8 +75,8 @@ const GridComponent = () => {
 									<td
 										key={`${cell.x}${cell.y}`}
 										style={{
-											width: cellSize,
-											height: cellSize,
+											width: settings.cellSize,
+											height: settings.cellSize,
 											fontSize: '20%',
 											backgroundColor: getCellColor(cell),
 										}}

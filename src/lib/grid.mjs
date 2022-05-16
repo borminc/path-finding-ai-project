@@ -122,4 +122,12 @@ export default class Grid {
 
 		return cellList[getRandomInt(0, cellList.length - 1)];
 	}
+
+	cleanCells() {
+		for (const row of this.cells) {
+			for (const cell of row) {
+				cell.clean();
+			}
+		}
+	}
 }

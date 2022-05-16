@@ -93,3 +93,30 @@ test('should make a deep clone', () => {
 	expect(cell).not.toEqual(clone);
 	expect(cell.x).toBe(1);
 });
+
+it('should clean', () => {
+	const cell = new Cell([1, 2], 'data');
+	const cleanCell = cell.clone();
+
+	expect(cell.clean).toBeDefined();
+	expect(cell).toEqual(cleanCell);
+
+	cell.f = 1;
+	cell.h = 4;
+	cell.g = 7;
+	cell.prev = null;
+
+	cell.isObstacle = true;
+	cell.isVisited = true;
+
+	expect(cell).not.toEqual(cleanCell);
+
+	cell.clean();
+
+	expect(cell.f).toBe(0);
+	expect(cell.h).toBe(0);
+	expect(cell.f).toBe(0);
+	expect(cell.prev).toBe(null);
+	expect(cell.isObstacle).toBe(false);
+	expect(cell.isVisited).toBe(false);
+});

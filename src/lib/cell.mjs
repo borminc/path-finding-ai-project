@@ -53,6 +53,18 @@ class Cell {
 	clone() {
 		return lodash.cloneDeep(this);
 	}
+
+	clean(data = null, { isObstacle = false } = {}) {
+		this.data = data ?? this.data;
+
+		this.f = 0;
+		this.h = 0;
+		this.g = 0;
+		this.prev = null;
+
+		this.isObstacle = isObstacle;
+		this.isVisited = false;
+	}
 }
 
 export default Cell;

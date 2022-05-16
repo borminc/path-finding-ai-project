@@ -1,36 +1,34 @@
 import React from 'react';
-import Grid from '../lib/grid.mjs';
-import AStar from '../lib/aStar.mjs';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const defaultGrid = () => new Grid(50, 50);
-
-const useAStar = ({
-	renderSpeed = 50,
-	numberOfObstacles = 100,
-	initialStartCell = null,
-	initialEndCell = null,
-	initialPath = null,
-	initialGrid = null,
-} = {}) => {
+const useAStar = (
+	aStar,
+	setAStar,
+	{
+		renderSpeed = 50,
+		numberOfObstacles = 100,
+		initialStartCell = null,
+		initialEndCell = null,
+		initialPath = null,
+		defaultAStar = null,
+	} = {}
+) => {
 	const [isProcessing, setIsProcessing] = React.useState(false);
 
 	const [path, setPath] = React.useState(initialPath ?? []);
 
-	const [aStar, setAStar] = React.useState(
-		new AStar(initialGrid ?? defaultGrid(), {
-			tracePathProgressCb: async (path, _aStar) => {
-				setPath(path);
-				setAStar(_aStar);
-
-				await sleep(renderSpeed);
-			},
-		})
-	);
-
 	const [startCell, setStartCell] = React.useState(initialStartCell);
 	const [endCell, setEndCell] = React.useState(initialEndCell);
+
+	React.useEffect(() => {
+		aStar.tracePathProgressCb = async (path, _aStar) => {
+			setPath(path);
+			setAStar(_aStar);
+
+			await sleep(renderSpeed);
+		};
+	}, [aStar, renderSpeed, setAStar]);
 
 	const generateRandomProblem = async () => {
 		if (isProcessing) {
@@ -76,7 +74,7 @@ const useAStar = ({
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
 
-		aStar.grid = initialGrid;
+		aStar.grid.cleanCells();
 
 		if (!randomizeObstacles) {
 			setAStar(aStar);
