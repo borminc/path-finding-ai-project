@@ -30,7 +30,7 @@ const useAStar = (
 		};
 	}, [aStar, renderSpeed, setAStar]);
 
-	const generateRandomProblem = async () => {
+	const startPathFinding = async () => {
 		if (isProcessing) {
 			return;
 		}
@@ -39,7 +39,8 @@ const useAStar = (
 
 		try {
 			const { aStar, newStartCell, newEndCell } = resetAStar({
-				randomizeObstacles: true,
+				startCell,
+				endCell,
 			});
 
 			const path = await aStar.findPath(newStartCell, newEndCell);
@@ -58,11 +59,11 @@ const useAStar = (
 		setIsProcessing(false);
 	};
 
-	const resetAStar = ({
-		startCell = null,
-		endCell = null,
-		randomizeObstacles = false,
-	} = {}) => {
+	const resetAStar = ({ startCell = null, endCell = null } = {}) => {
+		const randomizeObstacles = !(startCell && endCell);
+
+		cleanGrid({ withObstacles: randomizeObstacles });
+
 		const newStartCell =
 			startCell ?? aStar.grid.getRandomCell(cell => cell.isAPath());
 		const newEndCell =
@@ -73,8 +74,6 @@ const useAStar = (
 
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
-
-		aStar.grid.cleanCells();
 
 		if (!randomizeObstacles) {
 			setAStar(aStar);
@@ -102,6 +101,19 @@ const useAStar = (
 		return { aStar, newStartCell, newEndCell };
 	};
 
+	const cleanGrid = ({
+		withStartCell = true,
+		withEndCell = true,
+		withObstacles = true,
+	} = {}) => {
+		aStar.grid.cleanCells({ withObstacles });
+		setAStar(aStar);
+		setPath([]);
+
+		if (withStartCell) setStartCell(null);
+		if (withEndCell) setEndCell(null);
+	};
+
 	return {
 		isProcessing,
 		startCell,
@@ -112,7 +124,8 @@ const useAStar = (
 		setAStar,
 		path,
 		setPath,
-		generateRandomProblem,
+		cleanGrid,
+		startPathFinding,
 	};
 };
 

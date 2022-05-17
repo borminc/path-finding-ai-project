@@ -1,14 +1,12 @@
 import { toNumber } from 'lodash';
 import React from 'react';
-import AStar from './lib/aStar.mjs';
-import Grid from './lib/grid.mjs';
 
-const AStarSettingsModal = ({ aStar, setAStar, settings, setSettings }) => {
-	const [form, setForm] = React.useState({
-		width: aStar.grid.width,
-		height: aStar.grid.height,
-		...settings,
-	});
+const AStarSettingsModal = ({ settings, setSettings }) => {
+	const [form, setForm] = React.useState(settings);
+
+	React.useEffect(() => {
+		setForm(settings);
+	}, [settings]);
 
 	return (
 		<>
@@ -43,48 +41,16 @@ const AStarSettingsModal = ({ aStar, setAStar, settings, setSettings }) => {
 						</div>
 						<div className='modal-body'>
 							<div className='input-group mb-3'>
-								<div className='input-group-text'>Cell size</div>
-								<div className='btn-group me-3'>
-									<button
-										type='button'
-										className='btn btn-sm btn-outline-secondary'
-										onClick={() =>
-											setSettings({
-												...settings,
-												cellSize: settings.cellSize - 1,
-											})
-										}
-									>
-										-
-									</button>
-									<button
-										type='button'
-										className='btn btn-sm btn-outline-secondary'
-										onClick={() =>
-											setSettings({
-												...settings,
-												cellSize: settings.cellSize + 1,
-											})
-										}
-									>
-										+
-									</button>
-								</div>
-							</div>
-
-							<hr />
-
-							<div className='input-group mb-3'>
 								<div className='input-group-text'>Grid width & height</div>
 								<input
 									type='text'
 									className='form-control'
 									placeholder='Width'
-									value={form.width}
+									value={form.gridWidth}
 									onChange={e =>
 										setForm({
 											...form,
-											width: toNumber(e.target.value) || 0,
+											gridWidth: toNumber(e.target.value) || 0,
 										})
 									}
 								/>
@@ -92,18 +58,18 @@ const AStarSettingsModal = ({ aStar, setAStar, settings, setSettings }) => {
 									type='text'
 									className='form-control'
 									placeholder='Height'
-									value={form.height}
+									value={form.gridHeight}
 									onChange={e =>
 										setForm({
 											...form,
-											height: toNumber(e.target.value) || 0,
+											gridHeight: toNumber(e.target.value) || 0,
 										})
 									}
 								/>
 							</div>
 
 							<div className='input-group mb-3'>
-								<div className='input-group-text'>Num. of obstacles</div>
+								<div className='input-group-text'>Num. of random obstacles</div>
 								<input
 									type='text'
 									className='form-control'
@@ -116,6 +82,28 @@ const AStarSettingsModal = ({ aStar, setAStar, settings, setSettings }) => {
 										})
 									}
 								/>
+							</div>
+
+							<div className='form-check mb-3'>
+								<input
+									className='form-check-input'
+									type='checkbox'
+									id='allowDiagonalNeighbors'
+									value=''
+									checked={form.allowDiagonalNeighbors}
+									onChange={e => {
+										setForm({
+											...form,
+											allowDiagonalNeighbors: e.target.checked,
+										});
+									}}
+								/>
+								<label
+									className='form-check-label'
+									htmlFor='allowDiagonalNeighbors'
+								>
+									Allow diagonal movements
+								</label>
 							</div>
 
 							<div className='input-group mb-3'>
@@ -148,11 +136,10 @@ const AStarSettingsModal = ({ aStar, setAStar, settings, setSettings }) => {
 								className='btn btn-primary'
 								data-bs-dismiss='modal'
 								onClick={() => {
-									const { width, height, ...rest } = form;
-									const newAStar = new AStar(new Grid(width, height));
-
-									setAStar(newAStar);
-									setSettings(rest);
+									setSettings({
+										...settings,
+										...form,
+									});
 								}}
 							>
 								Apply

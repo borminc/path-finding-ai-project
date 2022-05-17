@@ -26,7 +26,11 @@ export default class Grid {
 			this.cells[y] = [...row];
 		}
 
-		this.allowedDirections = allowDiagonalNeighbors
+		this.allowDiagonalNeighbors = allowDiagonalNeighbors;
+	}
+
+	getAllowedDirections() {
+		return this.allowDiagonalNeighbors
 			? [
 					Direction.TOP_LEFT,
 					Direction.TOP,
@@ -52,7 +56,7 @@ export default class Grid {
 
 		const neighbors = [];
 
-		for (const [dirX, dirY] of this.allowedDirections) {
+		for (const [dirX, dirY] of this.getAllowedDirections()) {
 			const XY = [cell.x + dirX, cell.y + dirY];
 			try {
 				neighbors.push(this.getCellAtXY(XY));
@@ -123,10 +127,12 @@ export default class Grid {
 		return cellList[getRandomInt(0, cellList.length - 1)];
 	}
 
-	cleanCells() {
+	cleanCells({ withObstacles = true } = {}) {
 		for (const row of this.cells) {
 			for (const cell of row) {
-				cell.clean();
+				cell.clean(null, {
+					isObstacle: withObstacles ? false : cell.isObstacle,
+				});
 			}
 		}
 	}
