@@ -18,7 +18,7 @@ const AStarSettingsModal = () => {
 				data-bs-toggle='modal'
 				data-bs-target='#settings'
 			>
-				Settings
+				<i className='bi bi-gear-fill'></i>
 			</button>
 
 			<div

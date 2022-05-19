@@ -2,12 +2,17 @@ import { AStarServiceContext } from '../contexts';
 import AStarSettingsModal from './aStarSettingsModal';
 import React from 'react';
 
-const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, setCellSize }) => {
+const ToolBar = ({
+	isMakingObstacles,
+	setIsMakingObstacles,
+	setCellSize,
+	...props
+}) => {
 	const { isProcessing, generateRandomObstacles, startPathFinding, cleanGrid } =
 		React.useContext(AStarServiceContext);
 
 	return (
-		<div>
+		<div {...props}>
 			<h5>Path-finding AI</h5>
 
 			<div className='d-flex justify-content-between my-2'>
@@ -34,8 +39,9 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, setCellSize }) => {
 							onClick={startPathFinding}
 							disabled={isProcessing}
 							className='btn btn-sm btn-outline-primary me-1'
+							title='Run'
 						>
-							Run
+							<i className='bi bi-play-fill'></i>
 						</button>
 
 						<button
@@ -47,16 +53,18 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, setCellSize }) => {
 							}}
 							disabled={isProcessing}
 							className='btn btn-sm btn-outline-primary me-1'
+							title='Reset'
 						>
-							Clear
+							<i className='bi bi-arrow-counterclockwise me-1'></i>
 						</button>
 
 						<button
 							onClick={() => setIsMakingObstacles(true)}
 							disabled={isProcessing}
-							className='btn btn-sm btn-outline-primary me-1'
+							className='btn btn-sm btn-outline-primary ms-2 me-1'
+							title='Edit obstacles'
 						>
-							Edit obstacles
+							<i className='bi bi-pencil'></i>
 						</button>
 					</div>
 				)}
@@ -70,14 +78,14 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, setCellSize }) => {
 							className='btn btn-sm btn-outline-secondary'
 							onClick={() => setCellSize(prev => prev - 1)}
 						>
-							-
+							<i className='bi bi-zoom-out'></i>
 						</button>
 						<button
 							type='button'
 							className='btn btn-sm btn-outline-secondary'
 							onClick={() => setCellSize(prev => prev + 1)}
 						>
-							+
+							<i className='bi bi-zoom-in'></i>
 						</button>
 					</div>
 				</div>

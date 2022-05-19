@@ -82,7 +82,7 @@ const App = () => {
 	return (
 		<SettingsContext.Provider value={[settings, setSettings]}>
 			<AStarServiceContext.Provider value={aStarService}>
-				<div className='vh-100 vw-100 p-2'>
+				<div className='d-flex flex-column vh-100 vw-100 p-2'>
 					<ToolBar
 						isMakingObstacles={isMakingObstacles}
 						setIsMakingObstacles={setIsMakingObstacles}
@@ -90,14 +90,15 @@ const App = () => {
 					/>
 
 					<div
-						className='d-flex border'
-						style={{
-							overflow: 'scroll',
-							width: '100%',
-							height: '80%',
-						}}
+						className='d-flex border w-100 h-100 flex-grow-1'
+						style={{ overflow: 'scroll' }}
 					>
-						<table style={{ width: 'min-content', height: 'min-content' }}>
+						<table
+							style={{
+								width: 'min-content',
+								height: 'min-content',
+							}}
+						>
 							<tbody>
 								{aStar.grid.cells.map((row, i) => (
 									<tr key={i} className=''>
@@ -126,11 +127,13 @@ const App = () => {
 						</table>
 					</div>
 
-					{path && path.length > 0 && (
-						<small className='text-muted'>
-							Path: {path.map(cell => cell.getXYString()).join(', ')}
-						</small>
-					)}
+					<div>
+						{path && path.length > 0 && (
+							<small className='text-muted'>
+								Path: {path.map(cell => cell.getXYString()).join(', ')}
+							</small>
+						)}
+					</div>
 				</div>
 			</AStarServiceContext.Provider>
 		</SettingsContext.Provider>
