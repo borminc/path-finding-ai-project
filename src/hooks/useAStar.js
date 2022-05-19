@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React from 'react';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -11,7 +12,6 @@ const useAStar = (
 		initialStartCell = null,
 		initialEndCell = null,
 		initialPath = null,
-		defaultAStar = null,
 	} = {}
 ) => {
 	const [isProcessing, setIsProcessing] = React.useState(false);
@@ -60,9 +60,11 @@ const useAStar = (
 	};
 
 	const resetAStar = ({ startCell = null, endCell = null } = {}) => {
-		const randomizeObstacles = !(startCell && endCell);
-
-		cleanGrid({ withObstacles: randomizeObstacles });
+		cleanGrid({
+			withObstacles: false,
+			withEndCell: false,
+			withStartCell: false,
+		});
 
 		const newStartCell =
 			startCell ?? aStar.grid.getRandomCell(cell => cell.isAPath());
@@ -75,30 +77,36 @@ const useAStar = (
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
 
-		if (!randomizeObstacles) {
-			setAStar(aStar);
-			return { aStar, newStartCell, newEndCell };
-		}
-
-		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
-			alert(
-				'number of obstacles exceeds the number of available cells (minus start and end cells)'
-			);
-		} else {
-			for (let i = 0; i < numberOfObstacles; i++) {
-				aStar.grid
-					.getRandomCell(
-						cell =>
-							cell.isAPath() &&
-							!cell.isSameXY(newStartCell) &&
-							!cell.isSameXY(newEndCell)
-					)
-					.setIsObstacle(true).data = '  •  ';
-			}
-		}
-
 		setAStar(aStar);
 		return { aStar, newStartCell, newEndCell };
+	};
+
+	const generateRandomObstacles = () => {
+		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
+			alert(
+				'number of obstacles exceeds the number of available cells (minus start and end cells). Change this in settings.'
+			);
+			return;
+		}
+
+		cleanGrid({
+			withStartCell: false,
+			withEndCell: false,
+			withObstacles: true,
+		});
+
+		for (let i = 0; i < numberOfObstacles; i++) {
+			aStar.grid
+				.getRandomCell(cell => {
+					var condition = cell.isAPath();
+					if (startCell) condition = condition && !cell.isSameXY(startCell);
+					if (endCell) condition = condition && !cell.isSameXY(endCell);
+					return condition;
+				})
+				.setIsObstacle(true).data = '  •  ';
+		}
+
+		setAStar(cloneDeep(aStar)); // TODO: not efficient
 	};
 
 	const cleanGrid = ({
@@ -125,6 +133,7 @@ const useAStar = (
 		path,
 		setPath,
 		cleanGrid,
+		generateRandomObstacles,
 		startPathFinding,
 	};
 };
