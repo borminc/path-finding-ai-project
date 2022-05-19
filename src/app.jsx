@@ -60,6 +60,8 @@ const App = () => {
 			withObstacles: false,
 		});
 
+		if (isMouseDown) return;
+
 		if (!startCell && !endCell) setStartCell(cell);
 		else if (startCell && !endCell) setEndCell(cell);
 		else if ((!startCell && endCell) || (startCell && endCell)) {
