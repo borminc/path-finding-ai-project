@@ -2,21 +2,28 @@ import React from 'react';
 import useAStar from './hooks/useAStar.js';
 import { cloneDeep } from 'lodash';
 import ToolBar from './components/toolBar';
-import { AStarServiceContext, SettingsContext } from './contexts';
 import {
-	DEFAULT_A_STAR_SETTINGS,
-	DEFAULT_CELL_SIZE,
+	AStarServiceContext,
+	AStarSettingsContext,
+	GeneralSettingsContext,
+} from './contexts';
+import {
+	getAStarSettings,
+	getGeneralSettings,
 	mapSettingsToAStar,
 } from './utils';
 
 const App = () => {
-	const [settings, setSettings] = React.useState(DEFAULT_A_STAR_SETTINGS);
-	const [aStar, setAStar] = React.useState(mapSettingsToAStar(settings));
+	const [generalSettings, setGeneralSettings] =
+		React.useState(getGeneralSettings);
+
+	const [aStarSettings, setAStarSettings] = React.useState(getAStarSettings);
+
+	const [aStar, setAStar] = React.useState(mapSettingsToAStar(aStarSettings));
+	const aStarService = useAStar(aStar, setAStar, aStarSettings);
+
 	const [isMakingObstacles, setIsMakingObstacles] = React.useState(false);
 	const [isMouseDown, setIsMouseDown] = React.useState(false);
-	const [cellSize, setCellSize] = React.useState(DEFAULT_CELL_SIZE);
-
-	const aStarService = useAStar(aStar, setAStar, settings);
 
 	const {
 		isProcessing,
@@ -76,69 +83,89 @@ const App = () => {
 	};
 
 	React.useEffect(() => {
+		localStorage.setItem('general-settings', JSON.stringify(generalSettings));
+	}, [generalSettings]);
+
+	React.useEffect(() => {
 		cleanGrid();
-		setAStar(mapSettingsToAStar(settings));
+		setAStar(mapSettingsToAStar(aStarSettings));
+		localStorage.setItem('a-star-settings', JSON.stringify(aStarSettings));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [settings]);
+	}, [aStarSettings]);
 
 	return (
-		<SettingsContext.Provider value={[settings, setSettings]}>
-			<AStarServiceContext.Provider value={aStarService}>
-				<div className='d-flex flex-column vh-100 vw-100 p-2'>
-					<ToolBar
-						isMakingObstacles={isMakingObstacles}
-						setIsMakingObstacles={setIsMakingObstacles}
-						setCellSize={setCellSize}
-					/>
+		<GeneralSettingsContext.Provider
+			value={[generalSettings, setGeneralSettings]}
+		>
+			<AStarSettingsContext.Provider value={[aStarSettings, setAStarSettings]}>
+				<AStarServiceContext.Provider value={aStarService}>
+					<div className='d-flex flex-column w-100 h-100 p-2'>
+						<ToolBar
+							isMakingObstacles={isMakingObstacles}
+							setIsMakingObstacles={setIsMakingObstacles}
+						/>
 
-					<div
-						className='d-flex border w-100 h-100 flex-grow-1'
-						style={{ overflow: 'scroll' }}
-					>
-						<table
+						<div
+							className='d-flex flex-grow-1 border w-100 h-100'
 							style={{
-								width: 'min-content',
-								height: 'min-content',
+								overflow: 'scroll',
+								justifyContent: 'flex-start',
+								alignItems: 'flex-start',
 							}}
 						>
-							<tbody>
-								{aStar.grid.cells.map((row, i) => (
-									<tr key={i} className=''>
-										{row.map(cell => (
-											<td
-												key={`${cell.x}${cell.y}`}
-												style={{
-													width: cellSize,
-													height: cellSize,
-													fontSize: '20%',
-													backgroundColor: getCellColor(cell),
-												}}
-												onMouseOver={() => cellMouseOverHandler(cell)}
-												onMouseUp={() => setIsMouseDown(false)}
-												onMouseDown={() => {
-													cellMouseDownHandler(cell);
-													setIsMouseDown(true);
-												}}
-											>
-												{/* <div>{cell.getXYString()}</div> */}
-											</td>
-										))}
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
+							<table
+								style={{
+									margin: 'auto',
+									width: 'min-content',
+									height: 'min-content',
+									border: 'solid 1.5px black',
+								}}
+							>
+								<tbody>
+									{aStar.grid.cells.map((row, i) => (
+										<tr key={i}>
+											{row.map(cell => (
+												<td
+													key={`${cell.x}${cell.y}`}
+													style={{
+														width: generalSettings.cellSize,
+														height: generalSettings.cellSize,
+														fontSize: '20%',
+														backgroundColor: getCellColor(cell),
+														border: 'solid 1px darkgrey',
+													}}
+													onMouseOver={() => cellMouseOverHandler(cell)}
+													onMouseUp={() => setIsMouseDown(false)}
+													onMouseDown={() => {
+														cellMouseDownHandler(cell);
+														setIsMouseDown(true);
+													}}
+												>
+													{/* <div>{cell.getXYString()}</div> */}
+												</td>
+											))}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
 
-					<div>
-						{path && path.length > 0 && (
-							<small className='text-muted'>
-								Path: {path.map(cell => cell.getXYString()).join(', ')}
-							</small>
+						{generalSettings.showConsole && (
+							<div style={{ height: '50%', overflowY: 'scroll' }}>
+								<small>Console</small>
+								<div>
+									{path && path.length > 0 && (
+										<small className='text-muted'>
+											Path: {path.map(cell => cell.getXYString()).join(', ')}
+										</small>
+									)}
+								</div>
+							</div>
 						)}
 					</div>
-				</div>
-			</AStarServiceContext.Provider>
-		</SettingsContext.Provider>
+				</AStarServiceContext.Provider>
+			</AStarSettingsContext.Provider>
+		</GeneralSettingsContext.Provider>
 	);
 };
 

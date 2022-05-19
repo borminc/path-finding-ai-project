@@ -1,14 +1,15 @@
 import { toNumber } from 'lodash';
 import React from 'react';
-import { SettingsContext } from '../contexts';
+import { AStarSettingsContext } from '../contexts';
 
 const AStarSettingsModal = () => {
-	const [settings, setSettings] = React.useContext(SettingsContext);
-	const [form, setForm] = React.useState(settings);
+	const [aStarSettings, setAStarSettings] =
+		React.useContext(AStarSettingsContext);
+	const [form, setForm] = React.useState(aStarSettings);
 
 	React.useEffect(() => {
-		setForm(settings);
-	}, [settings]);
+		setForm(aStarSettings);
+	}, [aStarSettings]);
 
 	return (
 		<>
@@ -31,8 +32,8 @@ const AStarSettingsModal = () => {
 				<form
 					onSubmit={e => {
 						e.preventDefault();
-						setSettings({
-							...settings,
+						setAStarSettings({
+							...aStarSettings,
 							...form,
 						});
 					}}

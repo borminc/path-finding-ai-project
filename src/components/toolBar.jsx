@@ -1,15 +1,12 @@
-import { AStarServiceContext } from '../contexts';
+import { AStarServiceContext, GeneralSettingsContext } from '../contexts';
 import AStarSettingsModal from './aStarSettingsModal';
 import React from 'react';
+import { DEFAULT_GENERAL_SETTINGS } from '../utils';
 
-const ToolBar = ({
-	isMakingObstacles,
-	setIsMakingObstacles,
-	setCellSize,
-	...props
-}) => {
+const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 	const { isProcessing, generateRandomObstacles, startPathFinding, cleanGrid } =
 		React.useContext(AStarServiceContext);
+	const setGeneralSettings = React.useContext(GeneralSettingsContext)[1];
 
 	return (
 		<div {...props}>
@@ -72,18 +69,57 @@ const ToolBar = ({
 				<div>
 					<AStarSettingsModal />
 
+					<button
+						type='button'
+						className='btn btn-sm btn-outline-secondary ms-1'
+						title='Show console'
+						onClick={() =>
+							setGeneralSettings(prev => ({
+								...prev,
+								showConsole: !prev.showConsole,
+							}))
+						}
+					>
+						<i className='bi bi-window-desktop'></i>{' '}
+					</button>
+
 					<div className='btn-group ms-1'>
 						<button
 							type='button'
 							className='btn btn-sm btn-outline-secondary'
-							onClick={() => setCellSize(prev => prev - 1)}
+							title='Zoom out'
+							onClick={() =>
+								setGeneralSettings(prev => ({
+									...prev,
+									cellSize: prev.cellSize - 1,
+								}))
+							}
 						>
 							<i className='bi bi-zoom-out'></i>
 						</button>
 						<button
 							type='button'
 							className='btn btn-sm btn-outline-secondary'
-							onClick={() => setCellSize(prev => prev + 1)}
+							title='Reset cell size'
+							onClick={() =>
+								setGeneralSettings(prev => ({
+									...prev,
+									cellSize: DEFAULT_GENERAL_SETTINGS.cellSize,
+								}))
+							}
+						>
+							<i className='bi bi-search'></i>
+						</button>
+						<button
+							type='button'
+							className='btn btn-sm btn-outline-secondary'
+							title='Zoom in'
+							onClick={() =>
+								setGeneralSettings(prev => ({
+									...prev,
+									cellSize: prev.cellSize + 1,
+								}))
+							}
 						>
 							<i className='bi bi-zoom-in'></i>
 						</button>
