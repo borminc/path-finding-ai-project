@@ -13,6 +13,17 @@ export const DEFAULT_A_STAR_SETTINGS = {
 export const DEFAULT_GENERAL_SETTINGS = {
 	cellSize: 15,
 	showConsole: false,
+
+	colors: {
+		cellBorder: 'darkgrey',
+		gridBorder: 'black',
+		defaultCell: 'white',
+		obstacleCell: 'black',
+		visitedCell: 'lightgrey',
+		pathCell: 'yellow',
+		startCell: 'blue',
+		endCell: 'green',
+	},
 };
 
 export const mapSettingsToAStar = settings => {

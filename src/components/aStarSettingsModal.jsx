@@ -2,7 +2,7 @@ import { toNumber } from 'lodash';
 import React from 'react';
 import { AStarSettingsContext } from '../contexts';
 
-const AStarSettingsModal = () => {
+const AStarSettingsModal = ({ ...props }) => {
 	const [aStarSettings, setAStarSettings] =
 		React.useContext(AStarSettingsContext);
 	const [form, setForm] = React.useState(aStarSettings);
@@ -15,16 +15,16 @@ const AStarSettingsModal = () => {
 		<>
 			<button
 				type='button'
-				className='btn btn-sm btn-outline-secondary'
+				className={`btn btn-sm btn-outline-secondary ${props?.className ?? ''}`}
 				data-bs-toggle='modal'
-				data-bs-target='#settings'
+				data-bs-target='#a-start-settings'
 			>
-				<i className='bi bi-gear-fill'></i>
+				<i className='bi bi-star'></i>
 			</button>
 
 			<div
 				className='modal fade'
-				id='settings'
+				id='a-start-settings'
 				tabIndex='-1'
 				aria-labelledby='setting-label'
 				aria-hidden='true'

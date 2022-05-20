@@ -36,13 +36,13 @@ const App = () => {
 	} = aStarService;
 
 	const getCellColor = cell => {
-		if (!cell) return 'black';
-		if (cell.isObstacle) return 'black';
-		if (startCell && cell.isSameXY(startCell)) return 'blue';
-		if (endCell && cell.isSameXY(endCell)) return 'green';
-		if (cell.isInCellList(path)) return 'yellow';
-		if (cell.isVisited) return 'lightgrey';
-		return 'white';
+		const colors = generalSettings.colors;
+		if (!cell || cell.isObstacle) return colors.obstacleCell;
+		if (startCell && cell.isSameXY(startCell)) return colors.startCell;
+		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
+		if (cell.isInCellList(path)) return colors.pathCell;
+		if (cell.isVisited) return colors.visitedCell;
+		return colors.defaultCell;
 	};
 
 	const makeCellAnObstacle = cell => {
@@ -112,13 +112,14 @@ const App = () => {
 								justifyContent: 'flex-start',
 								alignItems: 'flex-start',
 							}}
+							onMouseUp={() => setIsMouseDown(false)}
 						>
 							<table
 								style={{
 									margin: 'auto',
 									width: 'min-content',
 									height: 'min-content',
-									border: 'solid 1.5px black',
+									border: `solid 1.5px ${generalSettings.colors.gridBorder}`,
 								}}
 							>
 								<tbody>
@@ -132,7 +133,7 @@ const App = () => {
 														height: generalSettings.cellSize,
 														fontSize: '20%',
 														backgroundColor: getCellColor(cell),
-														border: 'solid 1px darkgrey',
+														border: `solid 1px ${generalSettings.colors.cellBorder}`,
 													}}
 													onMouseOver={() => cellMouseOverHandler(cell)}
 													onMouseUp={() => setIsMouseDown(false)}

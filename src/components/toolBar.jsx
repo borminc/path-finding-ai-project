@@ -2,6 +2,7 @@ import { AStarServiceContext, GeneralSettingsContext } from '../contexts';
 import AStarSettingsModal from './aStarSettingsModal';
 import React from 'react';
 import { DEFAULT_GENERAL_SETTINGS } from '../utils';
+import GeneralSettingsModal from './generalSettingsModal';
 
 const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 	const { isProcessing, generateRandomObstacles, startPathFinding, cleanGrid } =
@@ -15,19 +16,22 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 			<div className='d-flex justify-content-between my-2'>
 				{isMakingObstacles ? (
 					<div>
+						<span className='me-2'>Click on the grid to make obstacles.</span>
 						<button
 							onClick={generateRandomObstacles}
 							disabled={isProcessing}
 							className='btn btn-sm btn-outline-primary me-1'
+							title='Randomize obstacles'
 						>
-							Randomize obstacles
+							<i className='bi bi-arrow-repeat'></i>
 						</button>
 						<button
 							onClick={() => setIsMakingObstacles(false)}
 							disabled={isProcessing}
 							className='btn btn-sm btn-outline-primary me-1'
+							title='Done'
 						>
-							Done
+							<i className='bi bi-check'></i>
 						</button>
 					</div>
 				) : (
@@ -68,6 +72,7 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 
 				<div>
 					<AStarSettingsModal />
+					<GeneralSettingsModal className='ms-1' />
 
 					<button
 						type='button'
@@ -83,7 +88,7 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 						<i className='bi bi-window-desktop'></i>{' '}
 					</button>
 
-					<div className='btn-group ms-1'>
+					<div className='btn-group ms-3'>
 						<button
 							type='button'
 							className='btn btn-sm btn-outline-secondary'
