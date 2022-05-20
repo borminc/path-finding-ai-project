@@ -152,11 +152,19 @@ const App = () => {
 						</div>
 
 						{generalSettings.showConsole && (
-							<div style={{ height: '50%', overflowY: 'scroll' }}>
+							<div
+								className='text-muted'
+								style={{ height: '50%', overflowY: 'scroll' }}
+							>
 								<small>Console</small>
 								<div>
 									{path && path.length > 0 && (
-										<small className='text-muted'>
+										<small>Total cost (f): {path[path.length - 1].f}</small>
+									)}
+								</div>
+								<div>
+									{path && path.length > 0 && (
+										<small>
 											Path: {path.map(cell => cell.getXYString()).join(', ')}
 										</small>
 									)}

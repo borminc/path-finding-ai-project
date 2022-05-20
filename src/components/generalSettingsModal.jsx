@@ -9,15 +9,16 @@ const GeneralSettingsModal = ({ ...props }) => {
 		GeneralSettingsContext
 	);
 
-	const [selectedColorKey, setSelectedColorKey] = React.useState(null);
+	const [selectedColor, setSelectedColor] = React.useState(null); // e.g., { key: 'cell', value: 'white' }
 
 	const colorPickerChangeHandler = color => {
-		if (!selectedColorKey) return;
+		if (!selectedColor) return;
+
 		setGeneralSettings(prev => ({
 			...prev,
 			colors: {
 				...prev.colors,
-				[selectedColorKey]: color,
+				[selectedColor.key]: color,
 			},
 		}));
 	};
@@ -57,55 +58,60 @@ const GeneralSettingsModal = ({ ...props }) => {
 							<div>
 								<h5>Appearance</h5>
 
-								{Object.entries(generalSettings.colors).map(
-									([key, value], i) => (
-										<div key={i} className='form-check'>
-											<input
-												className='form-check-input'
-												name='colors'
-												type='radio'
-												id={`color-${key}`}
-												data-key={key}
-												value={value}
-												onChange={() => setSelectedColorKey(key)}
-											/>
-											<label
-												className='form-check-label d-flex align-items-center'
-												htmlFor={`color-${key}`}
-											>
-												<div
-													className='me-2'
-													style={{
-														width: '1em',
-														height: '1em',
-														background: value,
-													}}
-												></div>
-												{key}
-											</label>
-										</div>
-									)
-								)}
+								<div className='d-flex justify-content-between align-items-start'>
+									<div>
+										{Object.entries(generalSettings.colors).map(
+											([key, value], i) => (
+												<div key={i} className='form-check'>
+													<input
+														className='form-check-input'
+														name='colors'
+														type='radio'
+														id={`color-${key}`}
+														data-key={key}
+														value={value}
+														onChange={() => setSelectedColor({ key, value })}
+													/>
+													<label
+														className='form-check-label d-flex align-items-center'
+														htmlFor={`color-${key}`}
+													>
+														<div
+															className='me-2'
+															style={{
+																width: '1em',
+																height: '1em',
+																background: value,
+															}}
+														></div>
+														{key}
+													</label>
+												</div>
+											)
+										)}
 
-								{selectedColorKey && (
-									<HexColorPicker
-										className='my-3'
-										color={generalSettings.colors[selectedColorKey]}
-										onChange={colorPickerChangeHandler}
-									/>
-								)}
+										<button
+											className='btn btn-link m-0 p-0 mt-2'
+											onClick={() => {
+												setGeneralSettings(prev => {
+													prev.colors = DEFAULT_GENERAL_SETTINGS.colors;
+													return cloneDeep(prev);
+												});
+												setSelectedColor(null);
+											}}
+										>
+											Reset
+										</button>
+									</div>
 
-								<button
-									className='btn btn-link'
-									onClick={() => {
-										setGeneralSettings(prev => {
-											prev.colors = DEFAULT_GENERAL_SETTINGS.colors;
-											return cloneDeep(prev);
-										});
-									}}
-								>
-									Reset
-								</button>
+									<div>
+										<HexColorPicker
+											key={selectedColor?.key || 'color-picker'}
+											color={selectedColor?.value || 'white'}
+											onChange={colorPickerChangeHandler}
+										/>
+									</div>
+								</div>
 							</div>
 						</div>
 
