@@ -32,6 +32,12 @@ const AStarSettingsModal = ({ ...props }) => {
 				<form
 					onSubmit={e => {
 						e.preventDefault();
+						if (form.gridWidth * form.gridHeight > 10000) {
+							setForm(aStarSettings);
+							return alert(
+								'Due to performance issues, the grid cannot be bigger than 10,000 cells.'
+							);
+						}
 						setAStarSettings({
 							...aStarSettings,
 							...form,

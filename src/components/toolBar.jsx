@@ -4,8 +4,16 @@ import React from 'react';
 import { DEFAULT_GENERAL_SETTINGS } from '../utils';
 import GeneralSettingsModal from './generalSettingsModal';
 
-const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
-	const { isProcessing, generateRandomObstacles, startPathFinding, cleanGrid } =
+const ToolBar = ({
+	isMakingObstacles,
+	setIsMakingObstacles,
+	isUserPlaying,
+	setIsUserPlaying,
+	testUserPath,
+	userCanPlay,
+	...props
+}) => {
+	const { isProcessing, generateRandomGrid, startPathFinding, cleanGrid } =
 		React.useContext(AStarServiceContext);
 	const setGeneralSettings = React.useContext(GeneralSettingsContext)[1];
 
@@ -17,14 +25,7 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 				{isMakingObstacles ? (
 					<div>
 						<span className='me-2'>Click on the grid to make obstacles.</span>
-						<button
-							onClick={generateRandomObstacles}
-							disabled={isProcessing}
-							className='btn btn-sm btn-outline-primary me-1'
-							title='Randomize obstacles'
-						>
-							<i className='bi bi-arrow-repeat'></i>
-						</button>
+
 						<button
 							onClick={() => setIsMakingObstacles(false)}
 							disabled={isProcessing}
@@ -38,7 +39,7 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 					<div>
 						<button
 							onClick={startPathFinding}
-							disabled={isProcessing}
+							disabled={isProcessing || isUserPlaying}
 							className='btn btn-sm btn-outline-primary me-1'
 							title='Run'
 						>
@@ -48,11 +49,11 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 						<button
 							onClick={() => {
 								let a = window.confirm(
-									'Everything will be lost. Are you sure?'
+									'Reset grid: Everything will be lost. Are you sure?'
 								);
 								if (a) cleanGrid();
 							}}
-							disabled={isProcessing}
+							disabled={isProcessing || isUserPlaying}
 							className='btn btn-sm btn-outline-primary me-1'
 							title='Reset'
 						>
@@ -60,13 +61,48 @@ const ToolBar = ({ isMakingObstacles, setIsMakingObstacles, ...props }) => {
 						</button>
 
 						<button
+							onClick={generateRandomGrid}
+							disabled={isProcessing}
+							className='btn btn-sm btn-outline-primary ms-2  me-1'
+							title='Randomize grid'
+						>
+							<i className='bi bi-arrow-repeat'></i>
+						</button>
+
+						<button
 							onClick={() => setIsMakingObstacles(true)}
 							disabled={isProcessing}
-							className='btn btn-sm btn-outline-primary ms-2 me-1'
+							className='btn btn-sm btn-outline-primary me-1'
 							title='Edit obstacles'
 						>
 							<i className='bi bi-pencil'></i>
 						</button>
+
+						<button
+							onClick={() => {
+								if (!userCanPlay) {
+									return alert('Pick start and end cells first!');
+								}
+								setIsUserPlaying(!isUserPlaying);
+							}}
+							disabled={isProcessing || !userCanPlay}
+							className='btn btn-sm btn-outline-primary ms-2 me-1'
+							title='Play'
+						>
+							{/* <i className='bi bi-play-fill'></i> */}
+							{!isUserPlaying ? 'Play' : 'Done'}
+						</button>
+
+						{isUserPlaying && (
+							<button
+								onClick={() => testUserPath(null)}
+								disabled={isProcessing}
+								className='btn btn-sm btn-outline-primary me-1'
+								title='Test path'
+							>
+								Test path
+							</button>
+						)}
 					</div>
 				)}
 

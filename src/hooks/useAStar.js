@@ -81,7 +81,7 @@ const useAStar = (
 		return { aStar, newStartCell, newEndCell };
 	};
 
-	const generateRandomObstacles = () => {
+	const generateRandomGrid = () => {
 		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
 			alert(
 				'number of obstacles exceeds the number of available cells (minus start and end cells). Change this in settings.'
@@ -95,17 +95,25 @@ const useAStar = (
 			withObstacles: true,
 		});
 
+		const newStartCell = aStar.grid.getRandomCell(cell => cell.isAPath());
+		const newEndCell = aStar.grid.getRandomCell(
+			cell => cell.isAPath() && !cell.isSameXY(newStartCell)
+		);
+
 		for (let i = 0; i < numberOfObstacles; i++) {
 			aStar.grid
 				.getRandomCell(cell => {
-					var condition = cell.isAPath();
-					if (startCell) condition = condition && !cell.isSameXY(startCell);
-					if (endCell) condition = condition && !cell.isSameXY(endCell);
-					return condition;
+					return (
+						cell.isAPath() &&
+						!cell.isSameXY(newStartCell) &&
+						!cell.isSameXY(newEndCell)
+					);
 				})
 				.setIsObstacle(true).data = '  •  ';
 		}
 
+		setStartCell(newStartCell);
+		setEndCell(newEndCell);
 		setAStar(cloneDeep(aStar)); // TODO: not efficient
 	};
 
@@ -133,7 +141,7 @@ const useAStar = (
 		path,
 		setPath,
 		cleanGrid,
-		generateRandomObstacles,
+		generateRandomGrid,
 		startPathFinding,
 	};
 };

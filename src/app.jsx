@@ -35,14 +35,37 @@ const App = () => {
 		cleanGrid,
 	} = aStarService;
 
+	const [isUserPlaying, setIsUserPlaying] = React.useState(false);
+	const [userPath, setUserPath] = React.useState([]);
+	const userCanPlay = React.useMemo(
+		() => startCell && endCell,
+		[startCell, endCell]
+	);
+
 	const getCellColor = cell => {
 		const colors = generalSettings.colors;
 		if (!cell || cell.isObstacle) return colors.obstacleCell;
 		if (startCell && cell.isSameXY(startCell)) return colors.startCell;
+
 		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
-		if (cell.isInCellList(path)) return colors.pathCell;
+
+		if (!isUserPlaying && cell.isInCellList(path)) return colors.pathCell;
+		if (isUserPlaying && cell.isInCellList(userPath)) return colors.pathCell;
 		if (cell.isVisited) return colors.visitedCell;
 		return colors.defaultCell;
+	};
+
+	const getCellOpacity = cell => {
+		if (!cell) return 1;
+		if (
+			isUserPlaying &&
+			startCell &&
+			endCell &&
+			(cell.isSameXY(startCell) || cell.isSameXY(endCell)) &&
+			!cell.isInCellList(userPath)
+		)
+			return 0.25;
+		return 1;
 	};
 
 	const makeCellAnObstacle = cell => {
@@ -54,12 +77,99 @@ const App = () => {
 		else cell.setIsObstacle(true);
 
 		setAStar(cloneDeep(aStar)); // TODO: fnd a less computationally expensive way to update the state
+		setUserPath([]);
+	};
+
+	const traceUserPath = cell => {
+		if (isProcessing) return;
+		if (!startCell || !endCell) return;
+		if (cell.isObstacle) return;
+
+		if (userPath.length === 0) {
+			if (!cell.isSameXY(startCell)) return;
+			return setUserPath(prev => [...prev, cell]);
+		}
+
+		const lastCell = userPath[userPath.length - 1];
+
+		if (lastCell.isSameXY(cell)) {
+			return setUserPath(userPath.filter(c => !c.isSameXY(cell)));
+		}
+
+		if (
+			!aStar.grid.areNeighbors(cell, lastCell) ||
+			userPath.some(c => cell.isSameXY(c))
+		)
+			return; // don't add if not neighbors with lastCell or cell is already in path
+
+		cell.prev = lastCell;
+		cell.g = (lastCell.g || 0) + (lastCell.isSameXY(startCell) ? 0 : 1); // don't count the start cell
+		cell.h = aStar.heuristic(cell, lastCell);
+		cell.f = cell.g + cell.h;
+		cell.isVisited = true;
+
+		if (cell.isSameXY(endCell)) {
+			setTimeout(() => {
+				testUserPath([...userPath, cell]);
+				setIsMouseDown(false);
+			}, 100);
+		}
+
+		if (!endCell.isInCellList(userPath)) {
+			setUserPath(prev => [...prev, cell]);
+		}
+	};
+
+	const testUserPath = async (_userPath = null) => {
+		_userPath = _userPath || userPath;
+
+		if (!isUserPlaying || !startCell || !endCell || _userPath.length === 0)
+			return;
+
+		if (
+			!_userPath[0].isSameXY(startCell) ||
+			!_userPath[_userPath.length - 1].isSameXY(endCell)
+		) {
+			return alert(
+				'Your path must begin and terminate at the start and end cells.'
+			);
+		}
+
+		const _aStar = cloneDeep(aStar);
+		const path = await _aStar.findPath(startCell, endCell, {
+			useCallback: false,
+		});
+
+		if (path.length === 0) {
+			alert('There is no path!');
+		}
+
+		const cost = path[path.length - 1].f;
+		const userCost = _userPath[_userPath.length - 1].f;
+
+		if (cost < userCost) {
+			setUserPath([]);
+			return alert(
+				`There is a better way! Your path costs ${userCost}, but there is a path that costs ${cost}.`
+			);
+		}
+
+		if (cost > userCost) {
+			setUserPath([]);
+			return alert(
+				`You beat the AI! Your path costs ${userCost}, but the AI's path costs ${cost}.`
+			);
+		}
+
+		if (cost === userCost)
+			return alert(`You got it! The best path costs ${cost}`);
 	};
 
 	const cellMouseDownHandler = cell => {
 		if (isProcessing) return;
 		if (isMakingObstacles) return makeCellAnObstacle(cell);
 		if (cell.isObstacle) return;
+		if (isUserPlaying) return traceUserPath(cell);
 
 		cleanGrid({
 			withEndCell: false,
@@ -82,6 +192,31 @@ const App = () => {
 		cellMouseDownHandler(cell);
 	};
 
+	const renderConsole = () => {
+		let _path = path;
+
+		if (isUserPlaying) {
+			_path = userPath;
+		}
+
+		return (
+			<>
+				<div>
+					{_path && _path.length > 0 && (
+						<small>Total cost (f): {_path[_path.length - 1].f}</small>
+					)}
+				</div>
+				<div>
+					{_path && _path.length > 0 && (
+						<small>
+							Path: {_path.map(cell => cell.getXYString()).join(', ')}
+						</small>
+					)}
+				</div>
+			</>
+		);
+	};
+
 	React.useEffect(() => {
 		localStorage.setItem('general-settings', JSON.stringify(generalSettings));
 	}, [generalSettings]);
@@ -89,9 +224,24 @@ const App = () => {
 	React.useEffect(() => {
 		cleanGrid();
 		setAStar(mapSettingsToAStar(aStarSettings));
+		setUserPath([]);
 		localStorage.setItem('a-star-settings', JSON.stringify(aStarSettings));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [aStarSettings]);
+
+	React.useEffect(() => {
+		setUserPath([]);
+	}, [startCell, endCell]);
+
+	React.useEffect(() => {
+		setUserPath([]);
+		cleanGrid({
+			withEndCell: false,
+			withStartCell: false,
+			withObstacles: false,
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isUserPlaying]);
 
 	return (
 		<GeneralSettingsContext.Provider
@@ -103,6 +253,10 @@ const App = () => {
 						<ToolBar
 							isMakingObstacles={isMakingObstacles}
 							setIsMakingObstacles={setIsMakingObstacles}
+							isUserPlaying={isUserPlaying}
+							setIsUserPlaying={setIsUserPlaying}
+							testUserPath={testUserPath}
+							userCanPlay={userCanPlay}
 						/>
 
 						<div
@@ -134,6 +288,7 @@ const App = () => {
 														fontSize: '20%',
 														backgroundColor: getCellColor(cell),
 														border: `solid 1px ${generalSettings.colors.cellBorder}`,
+														opacity: getCellOpacity(cell),
 													}}
 													onMouseOver={() => cellMouseOverHandler(cell)}
 													onMouseUp={() => setIsMouseDown(false)}
@@ -157,18 +312,7 @@ const App = () => {
 								style={{ height: '50%', overflowY: 'scroll' }}
 							>
 								<small>Console</small>
-								<div>
-									{path && path.length > 0 && (
-										<small>Total cost (f): {path[path.length - 1].f}</small>
-									)}
-								</div>
-								<div>
-									{path && path.length > 0 && (
-										<small>
-											Path: {path.map(cell => cell.getXYString()).join(', ')}
-										</small>
-									)}
-								</div>
+								{renderConsole()}
 							</div>
 						)}
 					</div>

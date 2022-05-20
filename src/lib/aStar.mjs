@@ -40,7 +40,7 @@ export default class AStar {
 		return startCell ? [startCell, ...path.reverse()] : path.reverse();
 	}
 
-	async findPath(startCell, endCell) {
+	async findPath(startCell, endCell, { useCallback = true } = {}) {
 		startCell = this.grid._resolveCell(startCell);
 		endCell = this.grid._resolveCell(endCell);
 
@@ -101,7 +101,7 @@ export default class AStar {
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.isVisited = true;
 
-					if (this.tracePathProgressCb) {
+					if (useCallback && this.tracePathProgressCb) {
 						const path = this.tracePath(
 							neighbor,
 							this.includesStartCellInPath ? startCell : null
