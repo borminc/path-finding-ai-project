@@ -33,6 +33,7 @@ const App = () => {
 		setStartCell,
 		setEndCell,
 		cleanGrid,
+		generateRandomGrid,
 	} = aStarService;
 
 	const [isUserPlaying, setIsUserPlaying] = React.useState(false);
@@ -103,8 +104,8 @@ const App = () => {
 			return; // don't add if not neighbors with lastCell or cell is already in path
 
 		cell.prev = lastCell;
-		cell.g = (lastCell.g || 0) + (lastCell.isSameXY(startCell) ? 0 : 1); // don't count the start cell
-		cell.h = aStar.heuristic(cell, lastCell);
+		cell.g = (lastCell.g || 0) + 1; // don't count the start cell
+		cell.h = aStar.heuristic(cell, endCell);
 		cell.f = cell.g + cell.h;
 		cell.isVisited = true;
 
@@ -161,8 +162,10 @@ const App = () => {
 			);
 		}
 
-		if (cost === userCost)
+		if (cost === userCost) {
+			if (generalSettings.continuousPlayMode) generateRandomGrid();
 			return alert(`You got it! The best path costs ${cost}`);
+		}
 	};
 
 	const cellMouseDownHandler = cell => {

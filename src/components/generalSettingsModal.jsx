@@ -113,6 +113,32 @@ const GeneralSettingsModal = ({ ...props }) => {
 									</div>
 								</div>
 							</div>
+
+							<div className='mt-4'>
+								<h5>Game</h5>
+
+								<div className='form-check form-switch mb-3'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='continuousPlayMode'
+										value=''
+										checked={generalSettings.continuousPlayMode}
+										onChange={e => {
+											setGeneralSettings(prev => ({
+												...prev,
+												continuousPlayMode: e.target.checked,
+											}));
+										}}
+									/>
+									<label
+										className='form-check-label'
+										htmlFor='continuousPlayMode'
+									>
+										Continuous play mode (auto new grid on win)
+									</label>
+								</div>
+							</div>
 						</div>
 
 						<div className='modal-footer'>

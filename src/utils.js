@@ -14,6 +14,8 @@ export const DEFAULT_GENERAL_SETTINGS = {
 	cellSize: 15,
 	showConsole: false,
 
+	continuousPlayMode: true,
+
 	colors: {
 		cellBorder: 'darkgrey',
 		gridBorder: 'black',

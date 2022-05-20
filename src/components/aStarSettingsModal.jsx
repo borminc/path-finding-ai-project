@@ -120,7 +120,7 @@ const AStarSettingsModal = ({ ...props }) => {
 									/>
 								</div>
 
-								<div className='form-check mb-3'>
+								<div className='form-check form-switch mb-3'>
 									<input
 										className='form-check-input'
 										type='checkbox'
