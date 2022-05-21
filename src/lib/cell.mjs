@@ -14,6 +14,7 @@ class Cell {
 
 		this.isObstacle = isObstacle;
 		this.isVisited = false;
+		this.isClosed = false;
 	}
 
 	display(mapDataFn = cell => cell.data) {
@@ -64,6 +65,7 @@ class Cell {
 
 		this.isObstacle = isObstacle;
 		this.isVisited = false;
+		this.isClosed = false;
 	}
 }
 

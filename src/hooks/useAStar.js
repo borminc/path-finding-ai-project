@@ -44,15 +44,12 @@ const useAStar = (
 
 			const path = await aStar.findPath(newStartCell, newEndCell);
 
-			if (!path || path.length === 0) {
-				alert('no path found');
-			}
-
-			setPath(path || []);
+			if (!path || path.length === 0) alert('No path found');
+			else setPath(path);
 		} catch (err) {
 			console.log(err);
 			setPath([]);
-			alert('error');
+			alert('Error');
 		}
 
 		setIsProcessing(false);

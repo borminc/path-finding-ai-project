@@ -56,13 +56,13 @@ const AStarSettingsModal = ({ ...props }) => {
 							<div className='modal-body'>
 								<div className='mb-3'>
 									<div>
-										<label for='grid-width' class='form-label'>
+										<label htmlFor='grid-width' className='form-label'>
 											Grid width: {form.gridWidth} cells
 										</label>
 										<input
 											id='grid-width'
 											type='range'
-											class='form-range'
+											className='form-range'
 											min='10'
 											max='200'
 											step='5'
@@ -84,13 +84,13 @@ const AStarSettingsModal = ({ ...props }) => {
 									</div>
 
 									<div>
-										<label for='grid-height' class='form-label'>
+										<label htmlFor='grid-height' className='form-label'>
 											Grid height: {form.gridHeight} cells
 										</label>
 										<input
 											id='grid-height'
 											type='range'
-											class='form-range'
+											className='form-range'
 											min='10'
 											max='200'
 											step='5'
@@ -121,15 +121,15 @@ const AStarSettingsModal = ({ ...props }) => {
 									)}
 
 									<div>
-										<label for='num-obstacles' class='form-label'>
+										<label htmlFor='num-obstacles' className='form-label'>
 											Num. of random obstacles: {form.numberOfObstacles} cells
 										</label>
 										<input
 											id='num-obstacles'
 											type='range'
-											class='form-range'
+											className='form-range'
 											min='0'
-											max={form.gridWidth * form.gridHeight - 2} // 2 for start and end cells
+											max={form.gridWidth * form.gridHeight - 2} // 2 htmlFor start and end cells
 											step='5'
 											value={form.numberOfObstacles}
 											onChange={e =>
@@ -142,13 +142,13 @@ const AStarSettingsModal = ({ ...props }) => {
 									</div>
 
 									<div>
-										<label for='render-speed' class='form-label'>
+										<label htmlFor='render-speed' className='form-label'>
 											Render speed: {form.renderSpeed} ms
 										</label>
 										<input
 											id='render-speed'
 											type='range'
-											class='form-range'
+											className='form-range'
 											min='0'
 											max='10000'
 											step='5'

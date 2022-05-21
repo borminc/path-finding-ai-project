@@ -1,6 +1,7 @@
 import Grid from './grid.mjs';
 import { colorString, highlightCell } from './utils/helpers.mjs';
 import { euclideanDistance, manhattanDistance } from './utils/heuristic.mjs';
+import Heap from 'heap-js';
 
 export default class AStar {
 	constructor(
@@ -30,6 +31,10 @@ export default class AStar {
 		return manhattanDistance(cell1, cell2);
 	}
 
+	initHeap() {
+		return new Heap((cell1, cell2) => cell1.f - cell2.f);
+	}
+
 	tracePath(endCell, startCell = null) {
 		var path = [];
 		var currentCell = endCell;
@@ -46,64 +51,50 @@ export default class AStar {
 		startCell = this.grid._resolveCell(startCell);
 		endCell = this.grid._resolveCell(endCell);
 
-		var openCellList = [];
-		const closedCellList = [];
+		const openCellsHeap = this.initHeap();
 
-		openCellList.push(startCell);
+		openCellsHeap.push(startCell);
 
-		while (openCellList.length > 0) {
-			// get the cell with lowest f(x) to process next
-			var currentCell = openCellList.reduce((prev, curr) =>
-				curr.f < prev.f ? curr : prev
-			);
+		while (!openCellsHeap.isEmpty()) {
+			const currentCell = openCellsHeap.pop(); // cell with lowest f
+			currentCell.isClosed = true; // mark as close because we will be done with this cell after this loop
 
-			// end case -- result has been found, return the traced path
 			if (currentCell.isSameXY(endCell)) {
+				// found
 				return this.tracePath(
 					currentCell,
 					this.includesStartCellInPath ? startCell : null
 				);
 			}
 
-			// normal case -- move currentCell from open to closed, process each of its neighbors
-			// eslint-disable-next-line no-loop-func
-			openCellList = openCellList.filter(cell => !cell.isSameXY(currentCell));
-			closedCellList.push(currentCell);
-
 			const neighbors = this.grid.getNeighborCells(currentCell);
 
 			for (const neighbor of neighbors) {
-				if (neighbor.isInCellList(closedCellList) || !neighbor.isAPath()) {
-					// not a valid cell to process, skip to next neighbor
-					continue;
-				}
+				if (neighbor.isClosed || !neighbor.isAPath()) continue;
 
-				// g score is the shortest distance from start to current cell, we need to check if
-				// the path we have arrived at this neighbor is the shortest one we have seen yet
-				const gScore = currentCell.g + 1; // 1 is the distance from a cell to it's neighbor
-				var gScoreIsBest = false;
+				const gScore = currentCell.g + 1; // assume cost between 2 cells is 1
 
-				if (!neighbor.isInCellList(openCellList)) {
-					// This the the first time we have arrived at this cell, it must be the best
-					// Also, we need to take the h (heuristic) score since we haven't done so yet
+				if (!neighbor.isVisited || gScore < neighbor.g) {
+					// first time seeing this cell, or
+					// saw it before but we have a lower g this time
 
-					gScoreIsBest = true;
-					neighbor.h = this.heuristic(neighbor, endCell);
-					openCellList.push(neighbor);
-				} else if (gScore < neighbor.g) {
-					// We have already seen the cell, but last time it had a worse g (distance from start)
-					gScoreIsBest = true;
-				}
-
-				if (gScoreIsBest) {
-					// Found an optimal path to this cell (so far).
-					// Store the prev cell that led to it and the scores
+					neighbor.isVisited = true;
 					neighbor.prev = currentCell;
+
+					neighbor.h = this.heuristic(neighbor, endCell);
 					neighbor.g = gScore;
 					neighbor.f = neighbor.g + neighbor.h;
-					neighbor.isVisited = true;
+
+					if (!neighbor.isVisited) {
+						openCellsHeap.push(neighbor); // first time
+					} else {
+						// scores have changed -> rearrange heap
+						openCellsHeap.remove(neighbor, (c1, c2) => c1.isSameXY(c2));
+						openCellsHeap.push(neighbor);
+					}
 
 					if (this.interrupted) {
+						// user interrupted/stopped the process
 						this.interrupted = false;
 						return this.tracePath(
 							neighbor,
@@ -123,7 +114,7 @@ export default class AStar {
 			}
 		}
 
-		// No path was found
+		// no path found
 		return [];
 	}
 
