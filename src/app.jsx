@@ -36,12 +36,10 @@ const App = () => {
 		generateRandomGrid,
 	} = aStarService;
 
-	const [isUserPlaying, setIsUserPlaying] = React.useState(false);
-	const [userPath, setUserPath] = React.useState([]);
-	const userCanPlay = React.useMemo(
-		() => startCell && endCell,
-		[startCell, endCell]
-	);
+	const [gameMode, setGameMode] = React.useState('explore');
+	const [userPath, setUserPath] = React.useState([]); // when user plays in play mode
+
+	const isInPlayMode = React.useMemo(() => gameMode === 'play', [gameMode]);
 
 	const getCellColor = cell => {
 		const colors = generalSettings.colors;
@@ -50,8 +48,8 @@ const App = () => {
 
 		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
 
-		if (!isUserPlaying && cell.isInCellList(path)) return colors.pathCell;
-		if (isUserPlaying && cell.isInCellList(userPath)) return colors.pathCell;
+		if (!isInPlayMode && cell.isInCellList(path)) return colors.pathCell;
+		if (isInPlayMode && cell.isInCellList(userPath)) return colors.pathCell;
 		if (cell.isVisited) return colors.visitedCell;
 		return colors.defaultCell;
 	};
@@ -59,7 +57,7 @@ const App = () => {
 	const getCellOpacity = cell => {
 		if (!cell) return 1;
 		if (
-			isUserPlaying &&
+			isInPlayMode &&
 			startCell &&
 			endCell &&
 			(cell.isSameXY(startCell) || cell.isSameXY(endCell)) &&
@@ -124,7 +122,7 @@ const App = () => {
 	const testUserPath = async (_userPath = null) => {
 		_userPath = _userPath || userPath;
 
-		if (!isUserPlaying || !startCell || !endCell || _userPath.length === 0)
+		if (!isInPlayMode || !startCell || !endCell || _userPath.length === 0)
 			return;
 
 		if (
@@ -172,7 +170,7 @@ const App = () => {
 		if (isProcessing) return;
 		if (isMakingObstacles) return makeCellAnObstacle(cell);
 		if (cell.isObstacle) return;
-		if (isUserPlaying) return traceUserPath(cell);
+		if (isInPlayMode) return traceUserPath(cell);
 
 		cleanGrid({
 			withEndCell: false,
@@ -198,7 +196,7 @@ const App = () => {
 	const renderConsole = () => {
 		let _path = path;
 
-		if (isUserPlaying) {
+		if (isInPlayMode) {
 			_path = userPath;
 		}
 
@@ -243,8 +241,11 @@ const App = () => {
 			withStartCell: false,
 			withObstacles: false,
 		});
+
+		if (isInPlayMode && !startCell && !endCell) generateRandomGrid(); // give user sth to start playing
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isUserPlaying]);
+	}, [isInPlayMode]);
 
 	return (
 		<GeneralSettingsContext.Provider
@@ -256,10 +257,10 @@ const App = () => {
 						<ToolBar
 							isMakingObstacles={isMakingObstacles}
 							setIsMakingObstacles={setIsMakingObstacles}
-							isUserPlaying={isUserPlaying}
-							setIsUserPlaying={setIsUserPlaying}
 							testUserPath={testUserPath}
-							userCanPlay={userCanPlay}
+							gameMode={gameMode}
+							setGameMode={setGameMode}
+							setUserPath={setUserPath}
 						/>
 
 						<div

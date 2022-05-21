@@ -1,21 +1,25 @@
-import { AStarServiceContext, GeneralSettingsContext } from '../contexts';
+import {
+	AStarServiceContext,
+	AStarSettingsContext,
+	GeneralSettingsContext,
+} from '../contexts';
 import AStarSettingsModal from './aStarSettingsModal';
 import React from 'react';
-import { DEFAULT_GENERAL_SETTINGS } from '../utils';
 import GeneralSettingsModal from './generalSettingsModal';
 
 const ToolBar = ({
 	isMakingObstacles,
 	setIsMakingObstacles,
-	isUserPlaying,
-	setIsUserPlaying,
 	testUserPath,
-	userCanPlay,
+	gameMode,
+	setGameMode,
+	setUserPath,
 	...props
 }) => {
 	const { isProcessing, generateRandomGrid, startPathFinding, cleanGrid } =
 		React.useContext(AStarServiceContext);
 	const setGeneralSettings = React.useContext(GeneralSettingsContext)[1];
+	const aStarSettings = React.useContext(AStarSettingsContext)[0];
 
 	return (
 		<div {...props}>
@@ -37,10 +41,20 @@ const ToolBar = ({
 							</button>
 						</div>
 					) : (
-						<div className='float-start my-1'>
+						<div className='float-start d-flex my-1'>
+							<select
+								className='form-select form-select-sm me-3'
+								aria-label='.form-select-sm example'
+								defaultValue={gameMode}
+								onChange={e => setGameMode(e.target.value)}
+							>
+								<option value='explore'>Explore</option>
+								<option value='play'>Play</option>
+							</select>
+
 							<button
 								onClick={startPathFinding}
-								disabled={isProcessing || isUserPlaying}
+								disabled={isProcessing || gameMode === 'play'}
 								className='btn btn-sm btn-outline-primary me-1'
 								title='Run'
 							>
@@ -54,7 +68,7 @@ const ToolBar = ({
 									);
 									if (a) cleanGrid();
 								}}
-								disabled={isProcessing || isUserPlaying}
+								disabled={isProcessing || gameMode === 'play'}
 								className='btn btn-sm btn-outline-primary me-3'
 								title='Reset'
 							>
@@ -79,29 +93,21 @@ const ToolBar = ({
 								<i className='bi bi-pencil'></i>
 							</button>
 
-							<button
-								onClick={() => {
-									if (!userCanPlay) {
-										return alert('Pick start and end cells first!');
-									}
-									setIsUserPlaying(!isUserPlaying);
-								}}
-								disabled={isProcessing || !userCanPlay}
-								className='btn btn-sm btn-outline-primary me-1'
-								title='Play'
-							>
-								{/* <i className='bi bi-play-fill'></i> */}
-								{!isUserPlaying ? 'Play' : 'Done'}
-							</button>
-
-							{isUserPlaying && (
+							{gameMode === 'play' && (
 								<button
-									onClick={() => testUserPath(null)}
+									onClick={() => {
+										setUserPath([]);
+										cleanGrid({
+											withStartCell: false,
+											withEndCell: false,
+											withObstacles: false,
+										});
+									}}
 									disabled={isProcessing}
-									className='btn btn-sm btn-outline-primary me-1'
-									title='Test path'
+									className='btn btn-sm btn-outline-primary me-3'
+									title='Clear path and retry'
 								>
-									Test path
+									Retry
 								</button>
 							)}
 						</div>
@@ -144,13 +150,35 @@ const ToolBar = ({
 							<button
 								type='button'
 								className='btn btn-sm btn-outline-secondary'
-								title='Reset cell size'
-								onClick={() =>
+								title='Fit width'
+								onClick={() => {
+									const cellSize = Math.round(
+										window.innerWidth / aStarSettings.gridWidth -
+											window.innerWidth * 0.001
+									);
 									setGeneralSettings(prev => ({
 										...prev,
-										cellSize: DEFAULT_GENERAL_SETTINGS.cellSize,
-									}))
-								}
+										cellSize: cellSize,
+									}));
+								}}
+							>
+								<i className='bi bi-search'></i>
+							</button>
+							<button
+								type='button'
+								className='btn btn-sm btn-outline-secondary'
+								title='Fit height'
+								onClick={() => {
+									const windowSafeArea = window.innerHeight - 80;
+									const cellSize = Math.round(
+										windowSafeArea / aStarSettings.gridHeight -
+											windowSafeArea * 0.001
+									);
+									setGeneralSettings(prev => ({
+										...prev,
+										cellSize: cellSize,
+									}));
+								}}
 							>
 								<i className='bi bi-search'></i>
 							</button>
