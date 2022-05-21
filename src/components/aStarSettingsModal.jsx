@@ -55,96 +55,112 @@ const AStarSettingsModal = ({ ...props }) => {
 							</div>
 							<div className='modal-body'>
 								<div className='mb-3'>
-									<label for='grid-width' class='form-label'>
-										Grid width: {form.gridWidth} cells
-									</label>
+									<div>
+										<label for='grid-width' class='form-label'>
+											Grid width: {form.gridWidth} cells
+										</label>
+										<input
+											id='grid-width'
+											type='range'
+											class='form-range'
+											min='10'
+											max='200'
+											step='5'
+											value={form.gridWidth}
+											onChange={e => {
+												const value = e.target.value;
+												const maxObstacles = value * form.gridHeight - 2;
 
-									<input
-										id='grid-width'
-										type='range'
-										class='form-range'
-										min='10'
-										max='200'
-										step='5'
-										value={form.gridWidth}
-										onChange={e => {
-											const value = e.target.value;
-											const maxObstacles = value * form.gridHeight - 2;
+												setForm({
+													...form,
+													gridWidth: toNumber(value) || 0,
+													numberOfObstacles:
+														maxObstacles < form.numberOfObstacles
+															? maxObstacles
+															: form.numberOfObstacles,
+												});
+											}}
+										/>
+									</div>
 
-											setForm({
-												...form,
-												gridWidth: toNumber(value) || 0,
-												numberOfObstacles:
-													maxObstacles < form.numberOfObstacles
-														? maxObstacles
-														: form.numberOfObstacles,
-											});
-										}}
-									/>
+									<div>
+										<label for='grid-height' class='form-label'>
+											Grid height: {form.gridHeight} cells
+										</label>
+										<input
+											id='grid-height'
+											type='range'
+											class='form-range'
+											min='10'
+											max='200'
+											step='5'
+											value={form.gridHeight}
+											onChange={e => {
+												const value = e.target.value;
+												const maxObstacles = value * form.gridWidth - 2;
 
-									<label for='grid-height' class='form-label'>
-										Grid height: {form.gridHeight} cells
-									</label>
-									<input
-										id='grid-height'
-										type='range'
-										class='form-range'
-										min='10'
-										max='200'
-										step='5'
-										value={form.gridHeight}
-										onChange={e => {
-											const value = e.target.value;
-											const maxObstacles = value * form.gridWidth - 2;
+												setForm({
+													...form,
+													gridHeight: toNumber(value) || 0,
+													numberOfObstacles:
+														maxObstacles < form.numberOfObstacles
+															? maxObstacles
+															: form.numberOfObstacles,
+												});
+											}}
+										/>
+									</div>
 
-											setForm({
-												...form,
-												gridHeight: toNumber(value) || 0,
-												numberOfObstacles:
-													maxObstacles < form.numberOfObstacles
-														? maxObstacles
-														: form.numberOfObstacles,
-											});
-										}}
-									/>
+									{form.gridWidth * form.gridHeight > 10000 && (
+										<div className='mb-3'>
+											<small className='text-danger'>
+												Performance of grids containing over 10,000 cells may be
+												affected depending on your system.
+											</small>
+										</div>
+									)}
 
-									<label for='num-obstacles' class='form-label'>
-										Num. of random obstacles: {form.numberOfObstacles} cells
-									</label>
-									<input
-										id='num-obstacles'
-										type='range'
-										class='form-range'
-										min='0'
-										max={form.gridWidth * form.gridHeight - 2} // 2 for start and end cells
-										step='5'
-										value={form.numberOfObstacles}
-										onChange={e =>
-											setForm({
-												...form,
-												numberOfObstacles: toNumber(e.target.value) || 0,
-											})
-										}
-									/>
+									<div>
+										<label for='num-obstacles' class='form-label'>
+											Num. of random obstacles: {form.numberOfObstacles} cells
+										</label>
+										<input
+											id='num-obstacles'
+											type='range'
+											class='form-range'
+											min='0'
+											max={form.gridWidth * form.gridHeight - 2} // 2 for start and end cells
+											step='5'
+											value={form.numberOfObstacles}
+											onChange={e =>
+												setForm({
+													...form,
+													numberOfObstacles: toNumber(e.target.value) || 0,
+												})
+											}
+										/>
+									</div>
 
-									<label for='render-speed' class='form-label'>
-										Render speed: {form.renderSpeed} ms
-									</label>
-									<input
-										id='render-speed'
-										type='range'
-										class='form-range'
-										min='0'
-										max='10000'
-										step='5'
-										value={form.renderSpeed}
-										onChange={e =>
-											setForm({
-												...form,
-												renderSpeed: toNumber(e.target.value) || 0,
-											})
-										}
-									/>
+									<div>
+										<label for='render-speed' class='form-label'>
+											Render speed: {form.renderSpeed} ms
+										</label>
+										<input
+											id='render-speed'
+											type='range'
+											class='form-range'
+											min='0'
+											max='10000'
+											step='5'
+											value={form.renderSpeed}
+											onChange={e =>
+												setForm({
+													...form,
+													renderSpeed: toNumber(e.target.value) || 0,
+												})
+											}
+										/>
+									</div>
 								</div>
 
 								<div className='form-check form-switch mb-3'>
