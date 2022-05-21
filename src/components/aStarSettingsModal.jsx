@@ -1,11 +1,12 @@
 import { toNumber } from 'lodash';
 import React from 'react';
-import { AStarSettingsContext } from '../contexts';
+import { AStarServiceContext, AStarSettingsContext } from '../contexts';
 
 const AStarSettingsModal = ({ ...props }) => {
 	const [aStarSettings, setAStarSettings] =
 		React.useContext(AStarSettingsContext);
 	const [form, setForm] = React.useState(aStarSettings);
+	const aStarService = React.useContext(AStarServiceContext);
 
 	React.useEffect(() => {
 		setForm(aStarSettings);
@@ -16,6 +17,7 @@ const AStarSettingsModal = ({ ...props }) => {
 			<button
 				type='button'
 				className={`btn btn-sm btn-outline-secondary ${props?.className ?? ''}`}
+				disabled={aStarService.isProcessing}
 				data-bs-toggle='modal'
 				data-bs-target='#a-start-settings'
 			>

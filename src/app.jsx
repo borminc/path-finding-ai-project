@@ -43,14 +43,15 @@ const App = () => {
 
 	const getCellColor = cell => {
 		const colors = generalSettings.colors;
-		if (!cell || cell.isObstacle) return colors.obstacleCell;
+
+		if (!cell) return colors.obstacleCell;
 		if (startCell && cell.isSameXY(startCell)) return colors.startCell;
-
 		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
-
 		if (!isInPlayMode && cell.isInCellList(path)) return colors.pathCell;
 		if (isInPlayMode && cell.isInCellList(userPath)) return colors.pathCell;
 		if (cell.isVisited) return colors.visitedCell;
+		if (cell.isObstacle) return colors.obstacleCell;
+
 		return colors.defaultCell;
 	};
 
@@ -75,8 +76,7 @@ const App = () => {
 		if (cell.isObstacle) cell.setIsObstacle(false);
 		else cell.setIsObstacle(true);
 
-		setAStar(cloneDeep(aStar)); // TODO: fnd a less computationally expensive way to update the state
-		setUserPath([]);
+		setUserPath([]); // somehow this also triggers an update for `aStar` that displays the obstacles
 	};
 
 	const traceUserPath = cell => {
@@ -260,6 +260,7 @@ const App = () => {
 							testUserPath={testUserPath}
 							gameMode={gameMode}
 							setGameMode={setGameMode}
+							userPath={userPath}
 							setUserPath={setUserPath}
 						/>
 

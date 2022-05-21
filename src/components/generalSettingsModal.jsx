@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import React from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { GeneralSettingsContext } from '../contexts';
@@ -94,8 +93,10 @@ const GeneralSettingsModal = ({ ...props }) => {
 											className='btn btn-link m-0 p-0 mt-2'
 											onClick={() => {
 												setGeneralSettings(prev => {
-													prev.colors = DEFAULT_GENERAL_SETTINGS.colors;
-													return cloneDeep(prev);
+													return {
+														...prev,
+														colors: DEFAULT_GENERAL_SETTINGS.colors,
+													};
 												});
 												setSelectedColor(null);
 											}}

@@ -20,6 +20,8 @@ export default class AStar {
 		this.useEuclideanDistanceForHeuristic = useEuclideanDistanceForHeuristic;
 		this.includesStartCellInPath = includesStartCellInPath;
 		this.tracePathProgressCb = tracePathProgressCb;
+
+		this.interrupted = false;
 	}
 
 	heuristic(cell1, cell2) {
@@ -100,6 +102,14 @@ export default class AStar {
 					neighbor.g = gScore;
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.isVisited = true;
+
+					if (this.interrupted) {
+						this.interrupted = false;
+						return this.tracePath(
+							neighbor,
+							this.includesStartCellInPath ? startCell : null
+						);
+					}
 
 					if (useCallback && this.tracePathProgressCb) {
 						const path = this.tracePath(

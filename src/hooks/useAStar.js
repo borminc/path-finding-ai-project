@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import React from 'react';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -59,6 +58,12 @@ const useAStar = (
 		setIsProcessing(false);
 	};
 
+	const stopFindingPath = () => {
+		if (!isProcessing) return;
+
+		aStar.interrupted = true;
+	};
+
 	const resetAStar = ({ startCell = null, endCell = null } = {}) => {
 		cleanGrid({
 			withObstacles: false,
@@ -114,7 +119,7 @@ const useAStar = (
 
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
-		setAStar(cloneDeep(aStar)); // TODO: not efficient
+		// setAStar(aStar); // somehow this isn't needed anymore ;-;
 	};
 
 	const cleanGrid = ({
@@ -143,6 +148,7 @@ const useAStar = (
 		cleanGrid,
 		generateRandomGrid,
 		startPathFinding,
+		stopFindingPath,
 	};
 };
 

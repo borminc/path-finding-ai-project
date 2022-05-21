@@ -13,11 +13,17 @@ const ToolBar = ({
 	testUserPath,
 	gameMode,
 	setGameMode,
+	userPath,
 	setUserPath,
 	...props
 }) => {
-	const { isProcessing, generateRandomGrid, startPathFinding, cleanGrid } =
-		React.useContext(AStarServiceContext);
+	const {
+		isProcessing,
+		generateRandomGrid,
+		startPathFinding,
+		stopFindingPath,
+		cleanGrid,
+	} = React.useContext(AStarServiceContext);
 	const setGeneralSettings = React.useContext(GeneralSettingsContext)[1];
 	const aStarSettings = React.useContext(AStarSettingsContext)[0];
 
@@ -27,101 +33,117 @@ const ToolBar = ({
 
 			<div className='d-md-flex justify-content-between my-2'>
 				<div className='col-12 col-md-6'>
-					{isMakingObstacles ? (
-						<div className='float-start my-1'>
-							<span className='me-2'>Click on the grid to make obstacles.</span>
+					<div className='float-start d-flex flex-wrap'>
+						{isMakingObstacles ? (
+							<>
+								<span className='me-2'>
+									Click on the grid to make obstacles.
+								</span>
 
-							<button
-								onClick={() => setIsMakingObstacles(false)}
-								disabled={isProcessing}
-								className='btn btn-sm btn-outline-primary me-1'
-								title='Done'
-							>
-								<i className='bi bi-check'></i>
-							</button>
-						</div>
-					) : (
-						<div className='float-start d-flex my-1'>
-							<select
-								className='form-select form-select-sm me-3'
-								aria-label='.form-select-sm example'
-								defaultValue={gameMode}
-								onChange={e => setGameMode(e.target.value)}
-							>
-								<option value='explore'>Explore</option>
-								<option value='play'>Play</option>
-							</select>
+								<button
+									onClick={() => setIsMakingObstacles(false)}
+									disabled={isProcessing}
+									className='btn btn-sm btn-outline-primary m-1'
+									title='Done'
+								>
+									<i className='bi bi-check'></i>
+								</button>
+							</>
+						) : (
+							<>
+								<select
+									className='form-select form-select-sm m-1'
+									style={{ width: 'min-content' }}
+									aria-label='.form-select-sm example'
+									defaultValue={gameMode}
+									onChange={e => setGameMode(e.target.value)}
+								>
+									<option value='explore'>Explore (AI)</option>
+									<option value='play'>Play</option>
+								</select>
 
-							<button
-								onClick={startPathFinding}
-								disabled={isProcessing || gameMode === 'play'}
-								className='btn btn-sm btn-outline-primary me-1'
-								title='Run'
-							>
-								<i className='bi bi-play-fill'></i>
-							</button>
+								<div className='btn-group m-1'>
+									<button
+										onClick={startPathFinding}
+										disabled={isProcessing || gameMode === 'play'}
+										className='btn btn-sm btn-outline-primary'
+										title='Run'
+									>
+										<i className='bi bi-play-fill'></i>
+									</button>
 
-							<button
-								onClick={() => {
-									let a = window.confirm(
-										'Reset grid: Everything will be lost. Are you sure?'
-									);
-									if (a) cleanGrid();
-								}}
-								disabled={isProcessing || gameMode === 'play'}
-								className='btn btn-sm btn-outline-primary me-3'
-								title='Reset'
-							>
-								<i className='bi bi-arrow-counterclockwise me-1'></i>
-							</button>
+									<button
+										onClick={stopFindingPath}
+										disabled={!isProcessing}
+										className='btn btn-sm btn-outline-primary'
+										title='Stop'
+									>
+										<i className='bi bi-stop-fill'></i>
+									</button>
+								</div>
 
-							<button
-								onClick={generateRandomGrid}
-								disabled={isProcessing}
-								className='btn btn-sm btn-outline-primary me-1'
-								title='Randomize grid'
-							>
-								<i className='bi bi-arrow-repeat'></i>
-							</button>
-
-							<button
-								onClick={() => setIsMakingObstacles(true)}
-								disabled={isProcessing}
-								className='btn btn-sm btn-outline-primary me-3'
-								title='Edit obstacles'
-							>
-								<i className='bi bi-pencil'></i>
-							</button>
-
-							{gameMode === 'play' && (
 								<button
 									onClick={() => {
-										setUserPath([]);
-										cleanGrid({
-											withStartCell: false,
-											withEndCell: false,
-											withObstacles: false,
-										});
+										let a = window.confirm(
+											'Reset grid: Everything will be lost. Are you sure?'
+										);
+										if (a) cleanGrid();
 									}}
 									disabled={isProcessing}
-									className='btn btn-sm btn-outline-primary me-3'
-									title='Clear path and retry'
+									className='btn btn-sm btn-outline-primary m-1'
+									title='Reset'
 								>
-									Retry
+									<i className='bi bi-arrow-counterclockwise'></i>
 								</button>
-							)}
-						</div>
-					)}
+
+								<button
+									onClick={generateRandomGrid}
+									disabled={isProcessing}
+									className='btn btn-sm btn-outline-primary m-1'
+									title='Randomize grid'
+								>
+									<i className='bi bi-arrow-repeat'></i>
+								</button>
+
+								<button
+									onClick={() => setIsMakingObstacles(true)}
+									disabled={isProcessing}
+									className='btn btn-sm btn-outline-primary m-1'
+									title='Edit obstacles'
+								>
+									<i className='bi bi-pencil'></i>
+								</button>
+
+								{gameMode === 'play' && userPath?.length > 0 && (
+									<button
+										onClick={() => {
+											setUserPath([]);
+											cleanGrid({
+												withStartCell: false,
+												withEndCell: false,
+												withObstacles: false,
+											});
+										}}
+										disabled={isProcessing}
+										className='btn btn-sm btn-outline-primary m-1'
+										title='Clear path and retry'
+									>
+										Retry
+									</button>
+								)}
+							</>
+						)}
+					</div>
 				</div>
 
 				<div className='col-12 col-md-6'>
-					<div className='float-end my-1'>
-						<AStarSettingsModal />
-						<GeneralSettingsModal className='ms-1' />
+					<div className='float-start float-md-end d-flex flex-wrap'>
+						<AStarSettingsModal className='m-1' />
+						<GeneralSettingsModal className='m-1' />
 
 						<button
 							type='button'
-							className='btn btn-sm btn-outline-secondary ms-1'
+							className='btn btn-sm btn-outline-secondary m-1'
 							title='Show console'
 							onClick={() =>
 								setGeneralSettings(prev => ({
@@ -130,10 +152,10 @@ const ToolBar = ({
 								}))
 							}
 						>
-							<i className='bi bi-window-desktop'></i>{' '}
+							<i className='bi bi-window-desktop'></i>
 						</button>
 
-						<div className='btn-group ms-3'>
+						<div className='btn-group m-1'>
 							<button
 								type='button'
 								className='btn btn-sm btn-outline-secondary'
