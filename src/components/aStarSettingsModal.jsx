@@ -34,12 +34,6 @@ const AStarSettingsModal = ({ ...props }) => {
 				<form
 					onSubmit={e => {
 						e.preventDefault();
-						if (form.gridWidth * form.gridHeight > 10000) {
-							setForm(aStarSettings);
-							return alert(
-								'Due to performance issues, the grid cannot be bigger than 10,000 cells.'
-							);
-						}
 						setAStarSettings({
 							...aStarSettings,
 							...form,
@@ -60,42 +54,70 @@ const AStarSettingsModal = ({ ...props }) => {
 								></button>
 							</div>
 							<div className='modal-body'>
-								<div className='input-group mb-3'>
-									<div className='input-group-text'>Grid width & height</div>
-									<input
-										type='text'
-										className='form-control'
-										placeholder='Width'
-										value={form.gridWidth}
-										onChange={e =>
-											setForm({
-												...form,
-												gridWidth: toNumber(e.target.value) || 0,
-											})
-										}
-									/>
-									<input
-										type='text'
-										className='form-control'
-										placeholder='Height'
-										value={form.gridHeight}
-										onChange={e =>
-											setForm({
-												...form,
-												gridHeight: toNumber(e.target.value) || 0,
-											})
-										}
-									/>
-								</div>
+								<div className='mb-3'>
+									<label for='grid-width' class='form-label'>
+										Grid width: {form.gridWidth} cells
+									</label>
 
-								<div className='input-group mb-3'>
-									<div className='input-group-text'>
-										Num. of random obstacles
-									</div>
 									<input
-										type='text'
-										className='form-control'
-										placeholder='Number of obstacles'
+										id='grid-width'
+										type='range'
+										class='form-range'
+										min='10'
+										max='200'
+										step='5'
+										value={form.gridWidth}
+										onChange={e => {
+											const value = e.target.value;
+											const maxObstacles = value * form.gridHeight - 2;
+
+											setForm({
+												...form,
+												gridWidth: toNumber(value) || 0,
+												numberOfObstacles:
+													maxObstacles < form.numberOfObstacles
+														? maxObstacles
+														: form.numberOfObstacles,
+											});
+										}}
+									/>
+
+									<label for='grid-height' class='form-label'>
+										Grid height: {form.gridHeight} cells
+									</label>
+									<input
+										id='grid-height'
+										type='range'
+										class='form-range'
+										min='10'
+										max='200'
+										step='5'
+										value={form.gridHeight}
+										onChange={e => {
+											const value = e.target.value;
+											const maxObstacles = value * form.gridWidth - 2;
+
+											setForm({
+												...form,
+												gridHeight: toNumber(value) || 0,
+												numberOfObstacles:
+													maxObstacles < form.numberOfObstacles
+														? maxObstacles
+														: form.numberOfObstacles,
+											});
+										}}
+									/>
+
+									<label for='num-obstacles' class='form-label'>
+										Num. of random obstacles: {form.numberOfObstacles} cells
+									</label>
+									<input
+										id='num-obstacles'
+										type='range'
+										class='form-range'
+										min='0'
+										max={form.gridWidth * form.gridHeight - 2} // 2 for start and end cells
+										step='5'
 										value={form.numberOfObstacles}
 										onChange={e =>
 											setForm({
@@ -104,14 +126,17 @@ const AStarSettingsModal = ({ ...props }) => {
 											})
 										}
 									/>
-								</div>
 
-								<div className='input-group mb-3'>
-									<div className='input-group-text'>Render speed (ms)</div>
+									<label for='render-speed' class='form-label'>
+										Render speed: {form.renderSpeed} ms
+									</label>
 									<input
-										type='text'
-										className='form-control'
-										placeholder='Render speed (ms)'
+										id='render-speed'
+										type='range'
+										class='form-range'
+										min='0'
+										max='10000'
+										step='5'
 										value={form.renderSpeed}
 										onChange={e =>
 											setForm({
