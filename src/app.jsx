@@ -264,6 +264,7 @@ const App = () => {
 						/>
 
 						<div
+							id='grid-container'
 							className='d-flex flex-grow-1 border w-100 h-100'
 							style={{
 								overflow: 'scroll',

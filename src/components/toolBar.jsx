@@ -152,27 +152,29 @@ const ToolBar = ({
 								className='btn btn-sm btn-outline-secondary'
 								title='Fit width'
 								onClick={() => {
-									const cellSize = Math.round(
-										window.innerWidth / aStarSettings.gridWidth -
-											window.innerWidth * 0.001
-									);
+									const gridContainer =
+										document.getElementById('grid-container');
+									const width = gridContainer?.clientWidth || window.innerWidth;
+									const cellSize = Math.round(width / aStarSettings.gridWidth);
 									setGeneralSettings(prev => ({
 										...prev,
 										cellSize: cellSize,
 									}));
 								}}
 							>
-								<i className='bi bi-search'></i>
+								<i className='bi bi-distribute-vertical'></i>
 							</button>
 							<button
 								type='button'
 								className='btn btn-sm btn-outline-secondary'
 								title='Fit height'
 								onClick={() => {
-									const windowSafeArea = window.innerHeight - 80;
+									const gridContainer =
+										document.getElementById('grid-container');
+									const height =
+										gridContainer?.clientHeight || window.innerHeight;
 									const cellSize = Math.round(
-										windowSafeArea / aStarSettings.gridHeight -
-											windowSafeArea * 0.001
+										height / aStarSettings.gridHeight
 									);
 									setGeneralSettings(prev => ({
 										...prev,
@@ -180,7 +182,7 @@ const ToolBar = ({
 									}));
 								}}
 							>
-								<i className='bi bi-search'></i>
+								<i className='bi bi-distribute-horizontal'></i>
 							</button>
 							<button
 								type='button'
