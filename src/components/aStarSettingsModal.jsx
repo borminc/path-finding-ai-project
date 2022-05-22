@@ -130,7 +130,7 @@ const AStarSettingsModal = ({ ...props }) => {
 											className='form-range'
 											min='0'
 											max={form.gridWidth * form.gridHeight - 2} // 2 htmlFor start and end cells
-											step='5'
+											step='1'
 											value={form.numberOfObstacles}
 											onChange={e =>
 												setForm({

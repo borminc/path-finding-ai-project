@@ -84,9 +84,9 @@ const useAStar = (
 	};
 
 	const generateRandomGrid = () => {
-		if (numberOfObstacles >= aStar.grid.width * aStar.grid.height - 2) {
+		if (numberOfObstacles > aStar.grid.width * aStar.grid.height - 2) {
 			alert(
-				'number of obstacles exceeds the number of available cells (minus start and end cells). Change this in settings.'
+				'Number of obstacles exceeds the number of available cells (minus start and end cells). Change this in A* settings.'
 			);
 			return;
 		}

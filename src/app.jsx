@@ -44,13 +44,12 @@ const App = () => {
 	const getCellColor = cell => {
 		const colors = generalSettings.colors;
 
-		if (!cell) return colors.obstacleCell;
+		if (!cell || cell.isObstacle) return colors.obstacleCell;
 		if (startCell && cell.isSameXY(startCell)) return colors.startCell;
 		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
 		if (!isInPlayMode && cell.isInCellList(path)) return colors.pathCell;
 		if (isInPlayMode && cell.isInCellList(userPath)) return colors.pathCell;
 		if (cell.isVisited) return colors.visitedCell;
-		if (cell.isObstacle) return colors.obstacleCell;
 
 		return colors.defaultCell;
 	};
@@ -68,7 +67,7 @@ const App = () => {
 		return 1;
 	};
 
-	const makeCellAnObstacle = cell => {
+	const toggleCellObstacle = cell => {
 		if (isProcessing) return;
 		if (startCell && cell.isSameXY(startCell)) return;
 		if (endCell && cell.isSameXY(endCell)) return;
@@ -92,14 +91,16 @@ const App = () => {
 		const lastCell = userPath[userPath.length - 1];
 
 		if (lastCell.isSameXY(cell)) {
-			return setUserPath(userPath.filter(c => !c.isSameXY(cell)));
+			userPath.pop();
+			return setUserPath([...userPath]);
 		}
 
 		if (
 			!aStar.grid.areNeighbors(cell, lastCell) ||
-			userPath.some(c => cell.isSameXY(c))
+			userPath.some(c => cell.isSameXY(c)) ||
+			lastCell.isSameXY(endCell)
 		)
-			return; // don't add if not neighbors with lastCell or cell is already in path
+			return; // don't add if not neighbors with lastCell or cell is already in path or lastCell is the endCell
 
 		cell.prev = lastCell;
 		cell.g = (lastCell.g || 0) + 1; // don't count the start cell
@@ -107,15 +108,18 @@ const App = () => {
 		cell.f = cell.g + cell.h;
 		cell.isVisited = true;
 
-		if (cell.isSameXY(endCell)) {
+		const newUserPath = [...userPath, cell];
+		setUserPath(newUserPath);
+
+		if (
+			newUserPath.length > 0 &&
+			newUserPath[0].isSameXY(startCell) &&
+			newUserPath[newUserPath.length - 1].isSameXY(endCell)
+		) {
 			setTimeout(() => {
-				testUserPath([...userPath, cell]);
+				testUserPath(newUserPath);
 				setIsMouseDown(false);
 			}, 100);
-		}
-
-		if (!endCell.isInCellList(userPath)) {
-			setUserPath(prev => [...prev, cell]);
 		}
 	};
 
@@ -135,40 +139,51 @@ const App = () => {
 		}
 
 		const _aStar = cloneDeep(aStar);
+
+		_aStar.grid.cleanCells({ withObstacles: false });
+
 		const path = await _aStar.findPath(startCell, endCell, {
 			useCallback: false,
 		});
 
 		if (path.length === 0) {
-			alert('There is no path!');
+			// this is just a precaution!
+			// this condition should never be met as user should have found a path for this function to run
+			return alert('There is no path!');
 		}
 
 		const cost = path[path.length - 1].f;
 		const userCost = _userPath[_userPath.length - 1].f;
 
+		const resetGame = generalSettings.continuousPlayMode;
+
+		if (cost === userCost) {
+			alert(`You got it! The best path costs ${cost}.`);
+			if (resetGame) generateRandomGrid();
+			return;
+		}
+
 		if (cost < userCost) {
-			setUserPath([]);
-			return alert(
+			alert(
 				`There is a better way! Your path costs ${userCost}, but there is a path that costs ${cost}.`
 			);
+			if (resetGame) setUserPath([]);
+			return;
 		}
 
 		if (cost > userCost) {
-			setUserPath([]);
-			return alert(
+			// kinda ironic as if this condition is met, the algorithm did not find the shortest path
+			alert(
 				`You beat the AI! Your path costs ${userCost}, but the AI's path costs ${cost}.`
 			);
-		}
-
-		if (cost === userCost) {
-			if (generalSettings.continuousPlayMode) generateRandomGrid();
-			return alert(`You got it! The best path costs ${cost}`);
+			if (resetGame) setUserPath([]);
+			return;
 		}
 	};
 
 	const cellMouseDownHandler = cell => {
 		if (isProcessing) return;
-		if (isMakingObstacles) return makeCellAnObstacle(cell);
+		if (isMakingObstacles) return toggleCellObstacle(cell);
 		if (cell.isObstacle) return;
 		if (isInPlayMode) return traceUserPath(cell);
 
@@ -188,7 +203,7 @@ const App = () => {
 		}
 	};
 
-	const cellMouseOverHandler = cell => {
+	const cellMouseEnterHandler = cell => {
 		if (!isMouseDown) return;
 		cellMouseDownHandler(cell);
 	};
@@ -253,7 +268,10 @@ const App = () => {
 		>
 			<AStarSettingsContext.Provider value={[aStarSettings, setAStarSettings]}>
 				<AStarServiceContext.Provider value={aStarService}>
-					<div className='d-flex flex-column w-100 h-100 p-2'>
+					<div
+						className='d-flex flex-column w-100 h-100 p-2'
+						onMouseUp={() => setIsMouseDown(false)}
+					>
 						<ToolBar
 							isMakingObstacles={isMakingObstacles}
 							setIsMakingObstacles={setIsMakingObstacles}
@@ -272,7 +290,6 @@ const App = () => {
 								justifyContent: 'flex-start',
 								alignItems: 'flex-start',
 							}}
-							onMouseUp={() => setIsMouseDown(false)}
 						>
 							<table
 								style={{
@@ -291,19 +308,43 @@ const App = () => {
 													style={{
 														width: generalSettings.cellSize,
 														height: generalSettings.cellSize,
-														fontSize: '20%',
+														fontSize: '70%',
 														backgroundColor: getCellColor(cell),
 														border: `solid 1px ${generalSettings.colors.cellBorder}`,
 														opacity: getCellOpacity(cell),
 													}}
-													onMouseOver={() => cellMouseOverHandler(cell)}
+													onMouseEnter={() => cellMouseEnterHandler(cell)}
 													onMouseUp={() => setIsMouseDown(false)}
 													onMouseDown={() => {
 														cellMouseDownHandler(cell);
 														setIsMouseDown(true);
 													}}
 												>
-													{/* <div>{cell.getXYString()}</div> */}
+													{startCell &&
+														generalSettings.cellSize >= 15 &&
+														cell.isSameXY(startCell) && (
+															<div className='text-white'>
+																<i
+																	className='bi bi-geo-alt-fill'
+																	style={{
+																		opacity: '70%',
+																	}}
+																></i>
+															</div>
+														)}
+
+													{endCell &&
+														generalSettings.cellSize >= 15 &&
+														cell.isSameXY(endCell) && (
+															<div className='text-white'>
+																<i
+																	className='bi bi-flag-fill'
+																	style={{
+																		opacity: '70%',
+																	}}
+																></i>
+															</div>
+														)}
 												</td>
 											))}
 										</tr>
