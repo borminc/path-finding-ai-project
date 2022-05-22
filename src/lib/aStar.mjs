@@ -77,8 +77,6 @@ export default class AStar {
 				if (!neighbor.isVisited || gScore < neighbor.g) {
 					// first time seeing this cell, or
 					// saw it before but we have a lower g this time
-
-					neighbor.isVisited = true;
 					neighbor.prev = currentCell;
 
 					neighbor.h = this.heuristic(neighbor, endCell);
@@ -86,7 +84,9 @@ export default class AStar {
 					neighbor.f = neighbor.g + neighbor.h;
 
 					if (!neighbor.isVisited) {
-						openCellsHeap.push(neighbor); // first time
+						// first time
+						neighbor.isVisited = true;
+						openCellsHeap.push(neighbor);
 					} else {
 						// scores have changed -> rearrange heap
 						openCellsHeap.remove(neighbor, (c1, c2) => c1.isSameXY(c2));
