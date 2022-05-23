@@ -10,12 +10,10 @@ import GeneralSettingsModal from './generalSettingsModal';
 const ToolBar = ({
 	isMakingObstacles,
 	setIsMakingObstacles,
-	testUserPath,
 	gameMode,
 	setGameMode,
 	userPath,
 	setUserPath,
-	...props
 }) => {
 	const {
 		isProcessing,
@@ -28,7 +26,7 @@ const ToolBar = ({
 	const aStarSettings = React.useContext(AStarSettingsContext)[0];
 
 	return (
-		<div {...props}>
+		<div>
 			<h5>Path-finding AI</h5>
 
 			<div className='d-md-flex justify-content-between my-2'>
@@ -227,4 +225,4 @@ const ToolBar = ({
 	);
 };
 
-export default ToolBar;
+export default React.memo(ToolBar);

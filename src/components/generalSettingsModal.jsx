@@ -136,7 +136,7 @@ const GeneralSettingsModal = ({ ...props }) => {
 										className='form-check-label'
 										htmlFor='continuousPlayMode'
 									>
-										Continuous play mode (auto new grid on win)
+										Continuous play mode (auto reset grid)
 									</label>
 								</div>
 							</div>

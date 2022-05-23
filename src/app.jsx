@@ -291,7 +291,6 @@ const App = () => {
 						<ToolBar
 							isMakingObstacles={isMakingObstacles}
 							setIsMakingObstacles={setIsMakingObstacles}
-							testUserPath={testUserPath}
 							gameMode={gameMode}
 							setGameMode={setGameMode}
 							userPath={userPath}

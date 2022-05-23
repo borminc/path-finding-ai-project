@@ -29,7 +29,48 @@ const useAStar = (
 		};
 	}, [aStar, renderSpeed, setAStar]);
 
-	const startPathFinding = async () => {
+	const cleanGrid = React.useCallback(
+		({
+			withStartCell = true,
+			withEndCell = true,
+			withObstacles = true,
+		} = {}) => {
+			aStar.grid.cleanCells({ withObstacles });
+			setAStar(aStar);
+			setPath([]);
+
+			if (withStartCell) setStartCell(null);
+			if (withEndCell) setEndCell(null);
+		},
+		[aStar, setAStar]
+	);
+
+	const resetAStar = React.useCallback(
+		({ startCell = null, endCell = null } = {}) => {
+			cleanGrid({
+				withObstacles: false,
+				withEndCell: false,
+				withStartCell: false,
+			});
+
+			const newStartCell =
+				startCell ?? aStar.grid.getRandomCell(cell => cell.isAPath());
+			const newEndCell =
+				endCell ??
+				aStar.grid.getRandomCell(
+					cell => cell.isAPath() && !cell.isSameXY(newStartCell)
+				);
+
+			setStartCell(newStartCell);
+			setEndCell(newEndCell);
+
+			setAStar(aStar);
+			return { aStar, newStartCell, newEndCell };
+		},
+		[aStar, cleanGrid, setAStar]
+	);
+
+	const startPathFinding = React.useCallback(async () => {
 		if (isProcessing) {
 			return;
 		}
@@ -53,37 +94,14 @@ const useAStar = (
 		}
 
 		setIsProcessing(false);
-	};
+	}, [endCell, isProcessing, resetAStar, startCell]);
 
-	const stopFindingPath = () => {
+	const stopFindingPath = React.useCallback(() => {
 		if (!isProcessing) return;
-
 		aStar.interrupted = true;
-	};
+	}, [aStar, isProcessing]);
 
-	const resetAStar = ({ startCell = null, endCell = null } = {}) => {
-		cleanGrid({
-			withObstacles: false,
-			withEndCell: false,
-			withStartCell: false,
-		});
-
-		const newStartCell =
-			startCell ?? aStar.grid.getRandomCell(cell => cell.isAPath());
-		const newEndCell =
-			endCell ??
-			aStar.grid.getRandomCell(
-				cell => cell.isAPath() && !cell.isSameXY(newStartCell)
-			);
-
-		setStartCell(newStartCell);
-		setEndCell(newEndCell);
-
-		setAStar(aStar);
-		return { aStar, newStartCell, newEndCell };
-	};
-
-	const generateRandomGrid = () => {
+	const generateRandomGrid = React.useCallback(() => {
 		if (numberOfObstacles > aStar.grid.width * aStar.grid.height - 2) {
 			alert(
 				'Number of obstacles exceeds the number of available cells (minus start and end cells). Change this in A* settings.'
@@ -117,20 +135,7 @@ const useAStar = (
 		setStartCell(newStartCell);
 		setEndCell(newEndCell);
 		// setAStar(aStar); // somehow this isn't needed anymore ;-;
-	};
-
-	const cleanGrid = ({
-		withStartCell = true,
-		withEndCell = true,
-		withObstacles = true,
-	} = {}) => {
-		aStar.grid.cleanCells({ withObstacles });
-		setAStar(aStar);
-		setPath([]);
-
-		if (withStartCell) setStartCell(null);
-		if (withEndCell) setEndCell(null);
-	};
+	}, [aStar.grid, cleanGrid, numberOfObstacles]);
 
 	return {
 		isProcessing,
