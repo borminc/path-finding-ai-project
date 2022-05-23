@@ -39,6 +39,7 @@ class Cell {
 	}
 
 	isInCellList(cells) {
+		console.log('isInCellList');
 		return cells.some(cell => this.isSameXY(cell));
 	}
 

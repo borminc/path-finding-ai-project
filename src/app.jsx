@@ -41,14 +41,30 @@ const App = () => {
 
 	const isInPlayMode = React.useMemo(() => gameMode === 'play', [gameMode]);
 
+	// index path once to prevent O(N) time-complexity
+	// look up on every cell render (determining if it's in the path)
+	const pathCellMap = React.useMemo(() => {
+		let _path = path;
+		if (isInPlayMode) _path = userPath;
+
+		return _path.reduce((acc, curr) => {
+			acc[curr.getXYString()] = curr;
+			return acc;
+		}, {});
+	}, [path, userPath, isInPlayMode]);
+
+	const cellIsInPath = React.useCallback(
+		cell => pathCellMap[cell.getXYString()],
+		[pathCellMap]
+	);
+
 	const getCellColor = cell => {
 		const colors = generalSettings.colors;
 
 		if (!cell || cell.isObstacle) return colors.obstacleCell;
 		if (startCell && cell.isSameXY(startCell)) return colors.startCell;
 		if (endCell && cell.isSameXY(endCell)) return colors.endCell;
-		if (!isInPlayMode && cell.isInCellList(path)) return colors.pathCell;
-		if (isInPlayMode && cell.isInCellList(userPath)) return colors.pathCell;
+		if (cellIsInPath(cell)) return colors.pathCell;
 		if (cell.isVisited) return colors.visitedCell;
 
 		return colors.defaultCell;
@@ -61,7 +77,7 @@ const App = () => {
 			startCell &&
 			endCell &&
 			(cell.isSameXY(startCell) || cell.isSameXY(endCell)) &&
-			!cell.isInCellList(userPath)
+			!cellIsInPath(cell)
 		)
 			return 0.25;
 		return 1;
