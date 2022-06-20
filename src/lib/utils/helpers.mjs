@@ -9,7 +9,7 @@ export function highlightCell(cell, startCell, endCell, path = []) {
 	if (cell.isEqualTo(startCell)) return colorString(s, 'cyan');
 	if (cell.isEqualTo(endCell)) return colorString(s, 'green');
 	if (cell.isInCellList(path)) return colorString(s, 'yellow');
-	if (cell.isVisited) return colorString(s, 'magenta');
+	if (cell.isVisited) return colorString(s, 'gray');
 	return s;
 }
 

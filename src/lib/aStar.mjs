@@ -1,7 +1,7 @@
 import Grid from './grid.mjs';
 import { colorString, highlightCell } from './utils/helpers.mjs';
 import { euclideanDistance, manhattanDistance } from './utils/heuristic.mjs';
-import Heap from 'heap-js';
+import { Heap } from 'heap-js';
 
 export default class AStar {
 	constructor(
@@ -118,7 +118,7 @@ export default class AStar {
 		return [];
 	}
 
-	findPathAndDisplay(startCell, endCell, { separator = '\t' } = {}) {
+	async findPathAndDisplay(startCell, endCell, { separator = '\t' } = {}) {
 		console.time('Time');
 		console.log(
 			`\n${highlightCell(startCell, startCell, endCell)}`,
@@ -126,7 +126,7 @@ export default class AStar {
 			`${highlightCell(endCell, startCell, endCell)}\n`
 		);
 
-		const path = this.findPath(...arguments);
+		const path = await this.findPath(...arguments);
 
 		if (this.tracePathProgressCb) console.log();
 
