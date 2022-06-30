@@ -14,6 +14,7 @@ const ToolBar = ({
 	setGameMode,
 	userPath,
 	setUserPath,
+	testUserPath,
 }) => {
 	const {
 		isProcessing,
@@ -111,6 +112,19 @@ const ToolBar = ({
 								>
 									<i className='bi bi-pencil'></i>
 								</button>
+
+								{gameMode === 'play' && (
+									<button
+										onClick={() => {
+											testUserPath([]);
+										}}
+										disabled={isProcessing}
+										className='btn btn-sm btn-outline-primary m-1'
+										title='No path'
+									>
+										No path
+									</button>
+								)}
 
 								{gameMode === 'play' && userPath?.length > 0 && (
 									<button

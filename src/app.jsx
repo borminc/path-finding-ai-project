@@ -142,18 +142,9 @@ const App = () => {
 	const testUserPath = async (_userPath = null) => {
 		_userPath = _userPath || userPath;
 
-		if (!isInPlayMode || !startCell || !endCell || _userPath.length === 0)
-			return;
+		if (!isInPlayMode || !startCell || !endCell) return;
 
-		if (
-			!_userPath[0].isSameXY(startCell) ||
-			!_userPath[_userPath.length - 1].isSameXY(endCell)
-		) {
-			return alert(
-				'Your path must begin and terminate at the start and end cells.'
-			);
-		}
-
+		// get the AI to find the path
 		const _aStar = cloneDeep(aStar);
 
 		_aStar.grid.cleanCells({ withObstacles: false });
@@ -161,6 +152,22 @@ const App = () => {
 		const path = await _aStar.findPath(startCell, endCell, {
 			useCallback: false,
 		});
+
+		if (_userPath.length === 0) {
+			// user determined there was no path
+			if (path.length === 0) return alert('You got it! There is no path!');
+			else return alert('There is a path! Try to find it!');
+		}
+
+		if (
+			_userPath.length > 0 &&
+			(!_userPath[0].isSameXY(startCell) ||
+				!_userPath[_userPath.length - 1].isSameXY(endCell))
+		) {
+			return alert(
+				'Your path must begin and terminate at the start and end cells.'
+			);
+		}
 
 		if (path.length === 0) {
 			// this is just a precaution!
@@ -295,6 +302,7 @@ const App = () => {
 							setGameMode={setGameMode}
 							userPath={userPath}
 							setUserPath={setUserPath}
+							testUserPath={testUserPath}
 						/>
 
 						<div
