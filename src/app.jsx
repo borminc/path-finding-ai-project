@@ -141,6 +141,7 @@ const App = () => {
 
 	const testUserPath = async (_userPath = null) => {
 		_userPath = _userPath || userPath;
+		const resetGame = generalSettings.continuousPlayMode;
 
 		if (!isInPlayMode || !startCell || !endCell) return;
 
@@ -155,8 +156,14 @@ const App = () => {
 
 		if (_userPath.length === 0) {
 			// user determined there was no path
-			if (path.length === 0) return alert('You got it! There is no path!');
-			else return alert('There is a path! Try to find it!');
+			if (path.length === 0) {
+				alert('You got it! There is no path!');
+				if (resetGame) generateRandomGrid();
+				return;
+			}
+
+			alert('There is a path! Try to find it!');
+			return;
 		}
 
 		if (
@@ -177,8 +184,6 @@ const App = () => {
 
 		const cost = path[path.length - 1].f;
 		const userCost = _userPath[_userPath.length - 1].f;
-
-		const resetGame = generalSettings.continuousPlayMode;
 
 		if (cost === userCost) {
 			alert(`You got it! The best path costs ${cost}.`);
