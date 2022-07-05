@@ -1,6 +1,10 @@
 {
 	"name": "path-finding-ai-project",
 	"version": "0.1.0",
+	"author": {
+		"name": "Sotort Bormin Chau",
+		"email": "schau@paragoniu.edu.kh"
+	},
 	"engines": {
 		"node": "16.15.0"
 	},
