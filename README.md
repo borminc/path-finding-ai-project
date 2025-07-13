@@ -1,6 +1,6 @@
 # A\* Path-Finding Algorithm
 
-This application is hosted on Heroku at [http://path-finding-ai.herokuapp.com](http://path-finding-ai.herokuapp.com).
+This application is hosted on Heroku at [https://borminc.github.io/path-finding-ai-project/](https://borminc.github.io/path-finding-ai-project/).
 
 ## Get started
 
