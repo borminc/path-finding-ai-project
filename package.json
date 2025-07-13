@@ -32,7 +32,7 @@
 		"eject": "react-scripts eject",
 		"start:lib": "node src/lib/index.mjs",
 		"predeploy": "npm run build",
-		"deploy": "gh-pages -b master -d build"
+		"deploy": "gh-pages -b gh-pages -d build"
 	},
 	"eslintConfig": {
 		"extends": [
