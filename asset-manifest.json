@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/path-finding-ai-project/static/css/main.aa2134e9.css",
+    "main.js": "/path-finding-ai-project/static/js/main.43de59df.js",
+    "static/media/bootstrap-icons.woff?": "/path-finding-ai-project/static/media/bootstrap-icons.7ff3ca6fa798de3f8ac2.woff",
+    "static/media/bootstrap-icons.woff2?": "/path-finding-ai-project/static/media/bootstrap-icons.f2539a501be3a673de05.woff2",
+    "index.html": "/path-finding-ai-project/index.html",
+    "main.aa2134e9.css.map": "/path-finding-ai-project/static/css/main.aa2134e9.css.map",
+    "main.43de59df.js.map": "/path-finding-ai-project/static/js/main.43de59df.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aa2134e9.css",
+    "static/js/main.43de59df.js"
+  ]
+}
