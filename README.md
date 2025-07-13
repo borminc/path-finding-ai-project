@@ -14,5 +14,3 @@ This application is hosted on Heroku at [http://path-finding-ai.herokuapp.com](h
 
 This installs the project dependencies and starts the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-Please contact me at [schau@paragoniu.edu.kh](mailto:schau@paragoniu.edu.kh) if there is any issue.
